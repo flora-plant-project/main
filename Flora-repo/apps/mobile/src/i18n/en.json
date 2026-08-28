@@ -1,0 +1,196 @@
+{
+  "tabs": {
+    "garden": "Garden",
+    "explore": "Explore",
+    "camera": "Identify",
+    "community": "Community",
+    "profile": "Profile"
+  },
+  "garden": {
+    "title": "My Garden",
+    "greetingMorning": "Good morning, {{name}}",
+    "greetingAfternoon": "Good afternoon, {{name}}",
+    "greetingEvening": "Good evening, {{name}}",
+    "needWater_one": "{{count}} plant needs water today",
+    "needWater_other": "{{count}} plants need water today",
+    "allHappy": "All plants are happy today",
+    "emptyTitle": "Every jneineh starts with one pot",
+    "emptyBody": "Add your first plant and Flora will tell you how to keep it happy.",
+    "emptyCta": "Add your first plant",
+    "chip": {
+      "waterNow": "Water now",
+      "today": "Today",
+      "inDays": "in {{count}}d"
+    }
+  },
+  "explore": {
+    "title": "Explore",
+    "hint": "Browse species and care guides",
+    "searchPlaceholder": "Search species — basil, زيتون…",
+    "add": "+ Add"
+  },
+  "community": {
+    "title": "Community",
+    "hint": "Tips and help from fellow growers",
+    "compose": "Share",
+    "loadMore": "Load more",
+    "timeNow": "just now",
+    "timeM": "{{count}}m",
+    "timeH": "{{count}}h",
+    "timeD": "{{count}}d",
+    "pendingBadge": "Being reviewed — only you can see this",
+    "helpBadge": "Needs help",
+    "confidence": "{{percent}}% confidence"
+  },
+  "compose": {
+    "title": "Share with the community",
+    "placeholder": "What's growing?",
+    "addImage": "Add photo ({{count}}/{{max}})",
+    "submit": "Post",
+    "pendingBanner": "Being reviewed — only you can see this",
+    "pendingBody": "Our moderators take a quick look at flagged photos. Your post will appear once approved.",
+    "devFlagged": "DEV · Attach flagged image",
+    "draftForMe": "Write it for me",
+    "drafting": "Writing…",
+    "draftPickPlant": "Which plant is this about?",
+    "draftNoPlants": "Add a plant first — the draft is written from what you have growing."
+  },
+  "userScreen": {
+    "follow": "Follow",
+    "following": "Following",
+    "posts": "Posts"
+  },
+  "camera": {
+    "title": "Identify a plant",
+    "hint": "Point at a leaf or flower for the best match",
+    "close": "Close"
+  },
+  "addPlant": {
+    "title": "Add a plant",
+    "tabSearch": "Search",
+    "tabPhoto": "By photo",
+    "searchPlaceholder": "Try basil, mint, زيتون…",
+    "noResults": "No species match \"{{query}}\"",
+    "takePhoto": "Take a photo",
+    "chooseFromLibrary": "Choose from library",
+    "analyzing": "Flora is taking a close look at your plant…",
+    "analyzingHint": "This usually takes a few seconds",
+    "timeoutTitle": "That took too long",
+    "timeoutBody": "The identification service didn't answer in time. Give it another try.",
+    "retry": "Try again",
+    "suggestionsTitle": "Is it one of these?",
+    "match": "{{percent}}% match",
+    "confirmTitle": "Add to your garden",
+    "nickname": "Nickname",
+    "carePreview": "Care preview",
+    "waterEvery_one": "Water every day",
+    "waterEvery_other": "Water every {{count}} days",
+    "tempRange": "Comfortable between {{min}}–{{max}}°C",
+    "autoSchedule": "Set watering schedule automatically",
+    "save": "Add plant",
+    "back": "Back"
+  },
+  "plant": {
+    "title": "Plant details"
+  },
+  "plantDetail": {
+    "water": "Water",
+    "sun": "Sun",
+    "temp": "Temp",
+    "everyNDays_one": "Every day",
+    "everyNDays_other": "Every {{count}} days",
+    "wateredToday": "Watered today ✓",
+    "intervalLabel": "Watering interval",
+    "intervalUnit_one": "day between waterings",
+    "intervalUnit_other": "days between waterings",
+    "confirmWaterTitle": "Watered it?",
+    "confirmWaterBody_one": "This restarts the cycle — next watering in {{count}} day.",
+    "confirmWaterBody_other": "This restarts the cycle — next watering in {{count}} days.",
+    "confirmWater": "Yes, watered",
+    "cancelWater": "Not yet",
+    "timeline": "Timeline",
+    "addLog": "+ Log",
+    "addPhoto": "Add a photo",
+    "photoAdded": "Photo added ✓",
+    "note": "Note",
+    "saveLog": "Save log",
+    "loadMore": "Load more",
+    "healthy": "Looking healthy",
+    "issueFound": "Issue detected",
+    "confidence": "{{percent}}% confidence",
+    "empty": "No entries yet — log your plant's first moment."
+  },
+  "diagnosis": {
+    "title": "Diagnosis",
+    "pending": "Still reading this one…",
+    "notFound": "We could not find that diagnosis.",
+    "carePlan": "Care plan",
+    "watchFor": "Watch for"
+  },
+  "diagnose": {
+    "identify": "Identify",
+    "diagnose": "Diagnose",
+    "gallery": "Gallery",
+    "progress1": "Reading the leaves…",
+    "progress2": "Checking against Lebanese seasons…",
+    "needsCare": "Needs a little care",
+    "healthyTitle": "Looking healthy!",
+    "healthySub": "No issues found. Keep it up.",
+    "lowConfidenceNote": "We're not fully sure — a fellow grower can help.",
+    "suggestions": "Best matches",
+    "issues": "What we found",
+    "treatment": "Treatment plan",
+    "waterLine_one": "Water every day in your zone",
+    "waterLine_other": "Water every {{count}} days in your zone",
+    "saveToPlant": "Save to plant",
+    "saved": "Saved ✓",
+    "newPlant": "New plant",
+    "askCommunity": "Ask the community",
+    "askReview": "Read it over before posting",
+    "communityHint": "Lebanese growers usually reply within the hour.",
+    "done": "Done",
+    "failedTitle": "Something wilted",
+    "failedBody": "We couldn't finish the check. Give it another try.",
+    "retry": "Try again",
+    "devFixture": "DEV · {{name}}"
+  },
+  "post": {
+    "title": "Post",
+    "commentLabel": "Comment",
+    "commentPlaceholder": "Add a comment…",
+    "send": "Send"
+  },
+  "profile": {
+    "title": "Profile",
+    "language": "Language",
+    "english": "English",
+    "arabic": "العربية",
+    "reminders": "Watering reminders",
+    "devReset": "DEV · Reset demo data"
+  },
+  "reminders": {
+    "title": "Watering reminders",
+    "empty": "No reminders yet — water a plant or set a schedule.",
+    "devRemind": "DEV · Remind me in 2 minutes"
+  },
+  "auth": {
+    "signInTitle": "Welcome back",
+    "signUpTitle": "Create your account",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "noAccount": "New to Flora? Create an account",
+    "haveAccount": "Already have an account? Sign in",
+    "passwordsMismatch": "Passwords do not match",
+    "zoneTitle": "Where do you grow?",
+    "zoneHint": "Flora tunes watering schedules to your climate zone.",
+    "zones": {
+      "COASTAL": { "name": "Coastal", "hint": "Beirut, Tripoli, Saida — mild and humid" },
+      "MOUNTAIN": { "name": "Mountain", "hint": "Cool nights and snowy winters" },
+      "BEKAA": { "name": "Bekaa", "hint": "Dry summers, cold winters" },
+      "SOUTH": { "name": "South", "hint": "Warm and sunny most of the year" }
+    }
+  }
+}

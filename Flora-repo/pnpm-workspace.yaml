@@ -1,0 +1,17 @@
+packages:
+  - apps/*
+  - services/*
+  - packages/*
+  - infra
+# Prisma's postinstall fetches the query engine and generates the client. pnpm
+# blocks lifecycle scripts by default, and without these the client import fails
+# at runtime with "@prisma/client did not initialize yet".
+allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  prisma: true
+minimumReleaseAgeExclude:
+  - expo-router@57.0.11
+  - expo-symbols@57.0.2
+  - expo-image-picker@57.0.8
+  - expo-notifications@57.0.9

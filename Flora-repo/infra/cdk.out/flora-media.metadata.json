@@ -1,0 +1,210 @@
+{
+  "/flora-media": [
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "file:///D:/flora/Flora-repo/infra/bin/flora.js:11 (:)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/flora-media/MediaApiAccessKey": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MediaApiAccessKey"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new FloraMediaStack (file:///D:/flora/Flora-repo/infra/src/media-stack.js:124:25)",
+        "file:///D:/flora/Flora-repo/infra/bin/flora.js:11 (:)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/flora-media/MediaApiCredentialsSecret": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MediaApiCredentialsSecret"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new FloraMediaStack (file:///D:/flora/Flora-repo/infra/src/media-stack.js:135:7)",
+        "file:///D:/flora/Flora-repo/infra/bin/flora.js:11 (:)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/flora-media/MediaBucketName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MediaBucketName"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new FloraMediaStack (file:///D:/flora/Flora-repo/infra/src/media-stack.js:157:5)",
+        "file:///D:/flora/Flora-repo/infra/bin/flora.js:11 (:)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/flora-media/MediaBaseUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MediaBaseUrl"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new FloraMediaStack (file:///D:/flora/Flora-repo/infra/src/media-stack.js:161:5)",
+        "file:///D:/flora/Flora-repo/infra/bin/flora.js:11 (:)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/flora-media/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "....pnpm...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/flora-media/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "....pnpm...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/flora-media/MediaBucket/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MediaBucketBCBB02BA"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Bucket2 in .pnpm...",
+        "new FloraMediaStack (file:///D:/flora/Flora-repo/infra/src/media-stack.js:54:20)",
+        "file:///D:/flora/Flora-repo/infra/bin/flora.js:11 (:)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/flora-media/MediaAccess/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MediaAccess288E2F37"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new ManagedPolicy2 in .pnpm...",
+        "new FloraMediaStack (file:///D:/flora/Flora-repo/infra/src/media-stack.js:93:26)",
+        "file:///D:/flora/Flora-repo/infra/bin/flora.js:11 (:)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/flora-media/MediaApiUser/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MediaApiUser4846AB5C"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new User2 in .pnpm...",
+        "new FloraMediaStack (file:///D:/flora/Flora-repo/infra/src/media-stack.js:123:20)",
+        "file:///D:/flora/Flora-repo/infra/bin/flora.js:11 (:)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/flora-media/MediaApiCredentials/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MediaApiCredentials1C1413F8"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Secret2 in .pnpm...",
+        "new FloraMediaStack (file:///D:/flora/Flora-repo/infra/src/media-stack.js:126:22)",
+        "file:///D:/flora/Flora-repo/infra/bin/flora.js:11 (:)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/flora-media/MediaCdn/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MediaCdn21E94F89"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Distribution2 in .pnpm...",
+        "new FloraMediaStack (file:///D:/flora/Flora-repo/infra/src/media-stack.js:143:26)",
+        "file:///D:/flora/Flora-repo/infra/bin/flora.js:11 (:)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/flora-media/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "....pnpm, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/flora-media/MediaBucket/Policy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MediaBucketPolicy68C27F6B"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Bucket2 in .pnpm...",
+        "new FloraMediaStack (file:///D:/flora/Flora-repo/infra/src/media-stack.js:54:20)",
+        "file:///D:/flora/Flora-repo/infra/bin/flora.js:11 (:)"
+      ]
+    }
+  ],
+  "/flora-media/MediaCdn/Origin1/S3OriginAccessControl/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MediaCdnOrigin1S3OriginAccessControlC8CBA0F7"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Distribution2 in .pnpm...",
+        "new FloraMediaStack (file:///D:/flora/Flora-repo/infra/src/media-stack.js:143:26)",
+        "file:///D:/flora/Flora-repo/infra/bin/flora.js:11 (:)",
+        "...node internals..."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,435 @@
+{
+ "Resources": {
+  "MediaBucketBCBB02BA": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "CorsConfiguration": {
+     "CorsRules": [
+      {
+       "AllowedHeaders": [
+        "*"
+       ],
+       "AllowedMethods": [
+        "PUT",
+        "GET",
+        "HEAD"
+       ],
+       "AllowedOrigins": [
+        "*"
+       ],
+       "MaxAge": 3600
+      }
+     ]
+    },
+    "LifecycleConfiguration": {
+     "Rules": [
+      {
+       "AbortIncompleteMultipartUpload": {
+        "DaysAfterInitiation": 7
+       },
+       "Status": "Enabled"
+      },
+      {
+       "ExpirationInDays": 7,
+       "Id": "ExpireUnattachedUploads",
+       "Status": "Enabled",
+       "TagFilters": [
+        {
+         "Key": "flora-state",
+         "Value": "pending"
+        }
+       ]
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "flora-media/MediaBucket/Resource"
+   }
+  },
+  "MediaBucketPolicy68C27F6B": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "MediaBucketBCBB02BA"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:*",
+       "Condition": {
+        "Bool": {
+         "aws:SecureTransport": "false"
+        }
+       },
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "MediaBucketBCBB02BA",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "MediaBucketBCBB02BA",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "s3:GetObject",
+       "Condition": {
+        "StringEquals": {
+         "AWS:SourceArn": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:",
+            {
+             "Ref": "AWS::Partition"
+            },
+            ":cloudfront::",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":distribution/",
+            {
+             "Ref": "MediaCdn21E94F89"
+            }
+           ]
+          ]
+         }
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "cloudfront.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "MediaBucketBCBB02BA",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "flora-media/MediaBucket/Policy/Resource"
+   }
+  },
+  "MediaAccess288E2F37": {
+   "Type": "AWS::IAM::ManagedPolicy",
+   "Properties": {
+    "Description": "",
+    "Path": "/",
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:PutObjectTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "MediaBucketBCBB02BA",
+            "Arn"
+           ]
+          },
+          "/uploads/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "flora-media/MediaAccess/Resource"
+   }
+  },
+  "MediaApiUser4846AB5C": {
+   "Type": "AWS::IAM::User",
+   "Properties": {
+    "ManagedPolicyArns": [
+     {
+      "Ref": "MediaAccess288E2F37"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "flora-media/MediaApiUser/Resource"
+   }
+  },
+  "MediaApiAccessKey": {
+   "Type": "AWS::IAM::AccessKey",
+   "Properties": {
+    "UserName": {
+     "Ref": "MediaApiUser4846AB5C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "flora-media/MediaApiAccessKey"
+   }
+  },
+  "MediaApiCredentials1C1413F8": {
+   "Type": "AWS::SecretsManager::Secret",
+   "Properties": {
+    "Description": "AWS keys for apps/api running outside AWS",
+    "SecretString": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"AWS_ACCESS_KEY_ID\":\"",
+       {
+        "Ref": "MediaApiAccessKey"
+       },
+       "\",\"AWS_SECRET_ACCESS_KEY\":\"",
+       {
+        "Fn::GetAtt": [
+         "MediaApiAccessKey",
+         "SecretAccessKey"
+        ]
+       },
+       "\"}"
+      ]
+     ]
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "flora-media/MediaApiCredentials/Resource"
+   }
+  },
+  "MediaCdnOrigin1S3OriginAccessControlC8CBA0F7": {
+   "Type": "AWS::CloudFront::OriginAccessControl",
+   "Properties": {
+    "OriginAccessControlConfig": {
+     "Name": "floramediaMediaCdnOrigin1S3OriginAccessControl96EEAE4D",
+     "OriginAccessControlOriginType": "s3",
+     "SigningBehavior": "always",
+     "SigningProtocol": "sigv4"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "flora-media/MediaCdn/Origin1/S3OriginAccessControl/Resource"
+   }
+  },
+  "MediaCdn21E94F89": {
+   "Type": "AWS::CloudFront::Distribution",
+   "Properties": {
+    "DistributionConfig": {
+     "Comment": "Flora uploaded photos",
+     "DefaultCacheBehavior": {
+      "AllowedMethods": [
+       "GET",
+       "HEAD"
+      ],
+      "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+      "Compress": true,
+      "TargetOriginId": "floramediaMediaCdnOrigin1BABA4CDA",
+      "ViewerProtocolPolicy": "redirect-to-https"
+     },
+     "Enabled": true,
+     "HttpVersion": "http2",
+     "IPV6Enabled": true,
+     "Origins": [
+      {
+       "DomainName": {
+        "Fn::GetAtt": [
+         "MediaBucketBCBB02BA",
+         "RegionalDomainName"
+        ]
+       },
+       "Id": "floramediaMediaCdnOrigin1BABA4CDA",
+       "OriginAccessControlId": {
+        "Fn::GetAtt": [
+         "MediaCdnOrigin1S3OriginAccessControlC8CBA0F7",
+         "Id"
+        ]
+       },
+       "S3OriginConfig": {
+        "OriginAccessIdentity": ""
+       }
+      }
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "flora-media/MediaCdn/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/3WMy47CMAxFv4V9aqA89jx2CM1oKtYopAaZtskodkAoyr+jtiBgwepeH53rHPL5HEYDfeXMlFVW0wFiIdpUSl95H3kCcRlMhaJWR/toffy6mszthfs7KdINxK22+oTly/kEO0bf0mcujEHmDd6SYjQehZvO9xCL7m6lviVlahfKo3dWIK6JxdMhCDmrismPpxM9vq2cFe/qdvkFv49T6sQg/0GSsq5EOPPwkk9hPIPR4MxEmQ9WqEH46/MOLWPiOjwBAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "flora-media/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "MediaApiCredentialsSecret": {
+   "Description": "Secrets Manager entry holding the API keys: aws secretsmanager get-secret-value --secret-id <this>",
+   "Value": {
+    "Fn::Join": [
+     "-",
+     [
+      {
+       "Fn::Select": [
+        0,
+        {
+         "Fn::Split": [
+          "-",
+          {
+           "Fn::Select": [
+            6,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "MediaApiCredentials1C1413F8"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "-",
+          {
+           "Fn::Select": [
+            6,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "MediaApiCredentials1C1413F8"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    ]
+   }
+  },
+  "MediaBucketName": {
+   "Description": "FLORA_S3_BUCKET for apps/api",
+   "Value": {
+    "Ref": "MediaBucketBCBB02BA"
+   }
+  },
+  "MediaBaseUrl": {
+   "Description": "FLORA_MEDIA_BASE_URL for apps/api",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Fn::GetAtt": [
+        "MediaCdn21E94F89",
+        "DomainName"
+       ]
+      }
+     ]
+    ]
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

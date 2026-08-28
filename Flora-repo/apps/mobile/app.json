@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Flora",
+    "slug": "flora",
+    "version": "0.1.0",
+    "scheme": "flora",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "edgeToEdgeEnabled": true
+    },
+    "plugins": ["expo-router", "expo-localization"],
+    "extra": {
+      "supportsRTL": true
+    }
+  }
+}

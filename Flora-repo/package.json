@@ -1,0 +1,26 @@
+{
+  "name": "flora",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "test": "pnpm -r test",
+    "test:live": "dotenv -e .env -- pnpm -F mobile test:live",
+    "format": "prettier --write .",
+    "demo:reset": "node scripts/demo-reset.js"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^10.0.0",
+    "eslint": "^10.8.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^17.9.0",
+    "prettier": "^3.9.6"
+  }
+}

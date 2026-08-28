@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16
+    # Host port is overridable: 5432 is often already taken by another project's
+    # Postgres. Set FLORA_DB_PORT in .env and match it in DATABASE_URL.
+    ports:
+      - '${FLORA_DB_PORT:-5432}:5432'
+    environment:
+      POSTGRES_USER: flora
+      POSTGRES_PASSWORD: flora
+      POSTGRES_DB: flora
+    volumes:
+      - flora_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U flora -d flora']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  flora_pgdata:

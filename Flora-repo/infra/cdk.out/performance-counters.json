@@ -1,0 +1,32 @@
+{
+  "counters": {
+    "phase:Synthesis": 11976,
+    "phase:Synthesis(cnt)": 1,
+    "validateTemplates": 11305,
+    "validateTemplates(cnt)": 1,
+    "CloudFormationValidate.validate": 9071,
+    "CloudFormationValidate.validate(cnt)": 1,
+    "fs.readFileSync": 660,
+    "fs.readFileSync(cnt)": 331,
+    "phase:Load": 605,
+    "phase:Load(cnt)": 1,
+    "phase:Construction": 34,
+    "phase:Construction(cnt)": 1,
+    "fs.realpathSync": 13,
+    "fs.realpathSync(cnt)": 521,
+    "Stack.resolve": 8,
+    "Stack.resolve(cnt)": 156,
+    "fs.writeFileSync": 7,
+    "fs.writeFileSync(cnt)": 7,
+    "fs.readdirSync": 7,
+    "fs.readdirSync(cnt)": 1,
+    "fs.lstatSync": 5,
+    "fs.lstatSync(cnt)": 21,
+    "fs.existsSync": 0,
+    "fs.existsSync(cnt)": 2,
+    "fs.statSync": 0,
+    "fs.statSync(cnt)": 1,
+    "CloudFormationValidate.diagnostics": 0,
+    "CloudFormationValidate.diagnostics(cnt)": 0
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "access_token": "fixture_healthy_basil",
+  "model_version": "plant_id:3.7.1",
+  "input": { "health": "all", "similar_images": false },
+  "result": {
+    "is_plant": { "probability": 0.998, "binary": true, "threshold": 0.5 },
+    "is_healthy": { "probability": 0.91, "binary": true, "threshold": 0.525 },
+    "classification": {
+      "suggestions": [
+        {
+          "id": "fixture-basil",
+          "name": "Ocimum basilicum",
+          "probability": 0.93,
+          "details": {
+            "common_names": ["Basil", "Sweet basil"],
+            "url": "https://en.wikipedia.org/wiki/Basil"
+          }
+        },
+        {
+          "id": "fixture-holy-basil",
+          "name": "Ocimum tenuiflorum",
+          "probability": 0.05,
+          "details": { "common_names": ["Holy basil"] }
+        }
+      ]
+    },
+    "disease": {
+      "suggestions": [
+        {
+          "id": "fixture-senescence",
+          "name": "senescence",
+          "probability": 0.04,
+          "details": { "treatment": { "prevention": ["Remove spent leaves"] } }
+        }
+      ]
+    }
+  }
+}

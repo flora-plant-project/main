@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&amp;family=Baloo+Bhaijaan+2:wght@400;500;700;800&amp;family=Mulish:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+body{margin:0;background:#EBE3D2;font-family:Mulish,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#2F6B4F}a:hover{color:#C4653F}
+.dv-turn{padding:40px 44px 36px;scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 22px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#22372B;color:#FFFDF6;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 Mulish,sans-serif;color:#22372B}
+.dv-opts{display:flex;flex-wrap:wrap;gap:38px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(47,107,79,.12);color:#2F6B4F;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:500 11.5px/1.3 Mulish,sans-serif;color:#75816B}
+.dv-opt:target .dv-oid{background:#2F6B4F;color:#FFFDF6}
+.dv-next{margin:26px 0 0;font:12px/1.5 Mulish,sans-serif;color:#75816B}
+</style>
+</helmet>
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">App windows from the planning doc: sign in, add plant, identify, plant detail, community, profile</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="2a" data-screen-label="Sign in">
+<div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Sign in · username and password only</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="height:100%;background:#F4EDDE;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 30px;text-align:center;font-family:Mulish,sans-serif">
+  <div style="position:relative;width:96px;height:72px">
+    <div style="position:absolute;left:50%;margin-left:-18px;bottom:0;width:36px;height:36px;background:#2F6B4F;border-radius:0 100% 0 100%;transform:rotate(45deg)"></div>
+    <div style="position:absolute;left:8px;bottom:2px;width:28px;height:28px;background:#5C8A6B;border-radius:0 100% 0 100%;transform:rotate(8deg)"></div>
+    <div style="position:absolute;right:8px;bottom:2px;width:28px;height:28px;background:#7FA98A;border-radius:0 100% 0 100%;transform:rotate(82deg)"></div>
+  </div>
+  <div style="font:700 36px 'Baloo 2',sans-serif;color:#2F6B4F;margin-top:8px">Flora</div>
+  <div style="font:500 13px Mulish,sans-serif;color:#75816B;margin-top:1px">Your garden companion for Lebanon</div>
+  <div style="width:100%;background:#FFFDF6;border:1px solid #EFE5D0;border-radius:22px;padding:18px;margin-top:26px;text-align:left;display:flex;flex-direction:column;gap:12px;box-sizing:border-box">
+    <div>
+      <div style="font:700 10px Mulish,sans-serif;letter-spacing:.12em;color:#A3987C">USERNAME</div>
+      <div style="margin-top:6px;height:44px;border-radius:12px;background:#F4EDDE;display:flex;align-items:center;padding:0 13px;font:600 13.5px Mulish,sans-serif;color:#22372B">maya.b</div>
+    </div>
+    <div>
+      <div style="font:700 10px Mulish,sans-serif;letter-spacing:.12em;color:#A3987C">PASSWORD</div>
+      <div style="margin-top:6px;height:44px;border-radius:12px;background:#F4EDDE;display:flex;align-items:center;padding:0 13px;font:600 15px Mulish,sans-serif;color:#22372B;letter-spacing:.2em">••••••••</div>
+    </div>
+    <div style="height:48px;border-radius:999px;background:#2F6B4F;color:#FFFDF6;font:700 14.5px Mulish,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:4px;box-shadow:0 10px 20px rgba(47,107,79,.22)" style-hover="background:#27593F">Start growing</div>
+    <div style="font:500 11px Mulish,sans-serif;color:#A3987C;text-align:center">No email needed. Pick a name and grow.</div>
+  </div>
+  <div style="font:500 12.5px Mulish,sans-serif;color:#75816B;margin-top:16px">Already planting? <span style="color:#2F6B4F;font-weight:700;cursor:pointer">Sign in</span></div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="2b" data-screen-label="Add a plant">
+<div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Add a plant · by name or photo</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="height:100%;background:#F4EDDE;display:flex;flex-direction:column;font-family:Mulish,sans-serif">
+  <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+    <div style="padding:70px 20px 0;display:flex;align-items:center;gap:12px">
+      <div style="width:36px;height:36px;border-radius:50%;background:#FFFDF6;border:1px solid #EBDFC8;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22372B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 7.5 12l7 7"/></svg>
+      </div>
+      <div style="font:600 22px 'Baloo 2',sans-serif;color:#22372B">Add a plant</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 20px 0">
+      <div style="background:#F6E3D7;border:1px solid #ECD2BE;border-radius:18px;padding:14px 13px;cursor:pointer" style-hover="background:#F2D9C8">
+        <div style="width:36px;height:36px;border-radius:50%;background:#C4653F;display:flex;align-items:center;justify-content:center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="7" width="17.6" height="13" rx="3.2"/><circle cx="12" cy="13.2" r="3.7"/><path d="M8.6 7l1.7-2.3h3.4L15.4 7"/></svg>
+        </div>
+        <div style="font:700 14px Mulish,sans-serif;color:#8F4526;margin-top:9px">By photo</div>
+        <div style="font:500 11px Mulish,sans-serif;color:#A9663F;margin-top:2px">Snap it and Flora identifies it</div>
+      </div>
+      <div style="background:#E4EDE2;border:1px solid #CFE0CE;border-radius:18px;padding:14px 13px;cursor:pointer" style-hover="background:#D9E6D6">
+        <div style="width:36px;height:36px;border-radius:50%;background:#2F6B4F;display:flex;align-items:center;justify-content:center">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.3"/><path d="M15.6 15.6 20.2 20.2"/></svg>
+        </div>
+        <div style="font:700 14px Mulish,sans-serif;color:#24543E;margin-top:9px">By name</div>
+        <div style="font:500 11px Mulish,sans-serif;color:#5C7263;margin-top:2px">Search the plant catalog</div>
+      </div>
+    </div>
+    <div style="padding:14px 20px 0">
+      <div style="height:46px;border-radius:999px;background:#FFFDF6;border:1px solid #EBDFC8;display:flex;align-items:center;gap:9px;padding:0 16px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A3AC9B" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.3"/><path d="M15.6 15.6 20.2 20.2"/></svg>
+        <span style="font:500 13px Mulish,sans-serif;color:#A3987C">Try &ldquo;jasmine&rdquo; or &ldquo;زعتر&rdquo;</span>
+      </div>
+    </div>
+    <div style="font:700 10.5px Mulish,sans-serif;letter-spacing:.13em;color:#A3987C;padding:18px 24px 0">POPULAR IN LEBANON</div>
+    <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:20px;margin:9px 20px 0;padding:2px 14px">
+      <div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #F1E8D4">
+        <div style="width:42px;height:42px;border-radius:12px;background:#E4EDE2;display:flex;align-items:center;justify-content:center;flex:none;color:#2F6B4F"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg></div>
+        <div style="flex:1"><div style="font:700 13.5px Mulish,sans-serif;color:#22372B">Yasmine</div><div style="font:500 11.5px Mulish,sans-serif;color:#8A927E">Arabian jasmine</div></div>
+        <div style="padding:5px 13px;border-radius:999px;border:1.2px solid #2F6B4F;color:#2F6B4F;font:700 11.5px Mulish,sans-serif;cursor:pointer;white-space:nowrap" style-hover="background:#E4EDE2">+ Add</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #F1E8D4">
+        <div style="width:42px;height:42px;border-radius:12px;background:#F6E3D7;display:flex;align-items:center;justify-content:center;flex:none;color:#C4653F"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg></div>
+        <div style="flex:1"><div style="font:700 13.5px Mulish,sans-serif;color:#22372B">Za&rsquo;atar</div><div style="font:500 11.5px Mulish,sans-serif;color:#8A927E">Lebanese wild thyme</div></div>
+        <div style="padding:5px 13px;border-radius:999px;border:1.2px solid #2F6B4F;color:#2F6B4F;font:700 11.5px Mulish,sans-serif;cursor:pointer;white-space:nowrap" style-hover="background:#E4EDE2">+ Add</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #F1E8D4">
+        <div style="width:42px;height:42px;border-radius:12px;background:#E4EDE2;display:flex;align-items:center;justify-content:center;flex:none;color:#2F6B4F"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg></div>
+        <div style="flex:1"><div style="font:700 13.5px Mulish,sans-serif;color:#22372B">Mjanouneh</div><div style="font:500 11.5px Mulish,sans-serif;color:#8A927E">Bougainvillea</div></div>
+        <div style="padding:5px 13px;border-radius:999px;border:1.2px solid #2F6B4F;color:#2F6B4F;font:700 11.5px Mulish,sans-serif;cursor:pointer;white-space:nowrap" style-hover="background:#E4EDE2">+ Add</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:11px;padding:11px 0">
+        <div style="width:42px;height:42px;border-radius:12px;background:#F6E3D7;display:flex;align-items:center;justify-content:center;flex:none;color:#C4653F"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg></div>
+        <div style="flex:1"><div style="font:700 13.5px Mulish,sans-serif;color:#22372B">Gardenia</div><div style="font:500 11.5px Mulish,sans-serif;color:#8A927E">Cape jasmine</div></div>
+        <div style="padding:5px 13px;border-radius:999px;border:1.2px solid #2F6B4F;color:#2F6B4F;font:700 11.5px Mulish,sans-serif;cursor:pointer;white-space:nowrap" style-hover="background:#E4EDE2">+ Add</div>
+      </div>
+    </div>
+  </div>
+  <div style="position:relative;background:#FFFDF6;border-top:1px solid #EBDFC8;display:flex;align-items:flex-end;justify-content:space-between;padding:10px 14px 24px;flex:none">
+    <div onClick="{{ setGardenAdd }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cGardenAdd }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Garden</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bGardenAdd }};margin-top:1px"></div>
+    </div>
+    <div onClick="{{ setExploreAdd }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cExploreAdd }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.3"/><path d="M15.6 15.6 20.2 20.2"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Explore</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bExploreAdd }};margin-top:1px"></div>
+    </div>
+    <div style="width:66px;height:46px;position:relative">
+      <div style="position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:#2F6B4F;border:5px solid #FFFDF6;box-shadow:0 10px 20px rgba(47,107,79,.35),inset 0 -3px 0 rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#27593F">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="7" width="17.6" height="13" rx="3.2"/><circle cx="12" cy="13.2" r="3.7"/><path d="M8.6 7l1.7-2.3h3.4L15.4 7"/></svg>
+      </div>
+    </div>
+    <div onClick="{{ setCommunityAdd }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cCommunityAdd }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.6" cy="9.6" r="3.1"/><path d="M3.2 19.3c.7-2.9 2.8-4.6 5.4-4.6s4.7 1.7 5.4 4.6"/><circle cx="16.6" cy="10.4" r="2.5"/><path d="M16.2 14.7c2.2.3 3.7 1.7 4.3 4"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Community</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bCommunityAdd }};margin-top:1px"></div>
+    </div>
+    <div onClick="{{ setProfileAdd }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cProfileAdd }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.6" r="3.4"/><path d="M5.4 19.8c1-3.3 3.6-5 6.6-5s5.6 1.7 6.6 5"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Profile</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bProfileAdd }};margin-top:1px"></div>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="2c" data-screen-label="Camera identify">
+<div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Identify by photo · result sheet</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+<div style="height:100%;background:#16241C;position:relative;font-family:Mulish,sans-serif;overflow:hidden">
+  <div style="position:absolute;inset:0"><image-slot id="camera-view" shape="rect" placeholder="point at a plant"></image-slot></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(22,36,28,.55) 0%,rgba(22,36,28,0) 22%,rgba(22,36,28,0) 55%,rgba(22,36,28,.6) 100%);pointer-events:none"></div>
+  <div style="position:absolute;top:64px;left:14px;width:36px;height:36px;border-radius:50%;background:rgba(255,253,246,.18);display:flex;align-items:center;justify-content:center;cursor:pointer">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="2.2" stroke-linecap="round"><path d="M5.5 5.5l13 13M18.5 5.5l-13 13"/></svg>
+  </div>
+  <div style="position:absolute;top:64px;right:14px;width:36px;height:36px;border-radius:50%;background:rgba(255,253,246,.18);display:flex;align-items:center;justify-content:center;cursor:pointer">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2.5 5 13.5h6L9.5 21.5l8.5-11h-6L13 2.5Z"/></svg>
+  </div>
+  <div style="position:absolute;top:150px;left:50%;transform:translateX(-50%);width:224px;height:224px;pointer-events:none">
+    <div style="position:absolute;top:0;left:0;width:34px;height:34px;border-top:3px solid #FFFDF6;border-left:3px solid #FFFDF6;border-radius:14px 0 0 0"></div>
+    <div style="position:absolute;top:0;right:0;width:34px;height:34px;border-top:3px solid #FFFDF6;border-right:3px solid #FFFDF6;border-radius:0 14px 0 0"></div>
+    <div style="position:absolute;bottom:0;left:0;width:34px;height:34px;border-bottom:3px solid #FFFDF6;border-left:3px solid #FFFDF6;border-radius:0 0 0 14px"></div>
+    <div style="position:absolute;bottom:0;right:0;width:34px;height:34px;border-bottom:3px solid #FFFDF6;border-right:3px solid #FFFDF6;border-radius:0 0 14px 0"></div>
+  </div>
+  <div style="position:absolute;top:392px;left:0;right:0;text-align:center;font:600 12px Mulish,sans-serif;color:rgba(255,253,246,.85);pointer-events:none">Center the leaves in the frame</div>
+  <div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDF6;border-radius:26px 26px 0 0;padding:12px 16px 30px;box-shadow:0 -12px 30px rgba(22,36,28,.35)">
+    <div style="width:40px;height:4px;border-radius:99px;background:#E7DCC5;margin:0 auto"></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+      <div style="width:46px;height:46px;border-radius:14px;background:#E4EDE2;display:flex;align-items:center;justify-content:center;flex:none;color:#2F6B4F">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg>
+      </div>
+      <div style="flex:1">
+        <div style="font:600 17px 'Baloo 2',sans-serif;color:#22372B">Gardenia</div>
+        <div style="font:500 12px Mulish,sans-serif;color:#75816B">Common on Beirut balconies</div>
+      </div>
+      <div style="font:700 13px Mulish,sans-serif;color:#2F6B4F;white-space:nowrap">94% match</div>
+    </div>
+    <div style="height:5px;border-radius:99px;background:#EFE5D0;margin-top:11px"><div style="height:5px;width:94%;border-radius:99px;background:#2F6B4F"></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+      <div style="height:48px;border-radius:999px;background:#2F6B4F;color:#FFFDF6;font:700 14.5px Mulish,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 20px rgba(47,107,79,.22)" style-hover="background:#27593F">Add to my garden</div>
+      <div style="height:44px;border-radius:999px;border:1.6px solid #C4653F;color:#C4653F;font:700 13.5px Mulish,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#F6E3D7">Check its health</div>
+      <div style="font:700 11.5px Mulish,sans-serif;color:#A3987C;text-align:center;cursor:pointer">Retake photo</div>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="2d" data-screen-label="Plant detail">
+<div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a>Plant detail · schedule and timeline</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="height:100%;background:#F4EDDE;display:flex;flex-direction:column;font-family:Mulish,sans-serif">
+  <div style="position:relative;height:225px;flex:none">
+    <image-slot id="detail-photo" shape="rect" placeholder="gardenia photo"></image-slot>
+    <div style="position:absolute;top:64px;left:14px;width:36px;height:36px;border-radius:50%;background:rgba(255,253,246,.88);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(34,55,43,.18)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22372B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 7.5 12l7 7"/></svg>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;padding:14px 16px 16px;gap:11px;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div>
+        <div style="font:600 24px 'Baloo 2',sans-serif;color:#22372B">Fairuz</div>
+        <div style="font:500 12.5px Mulish,sans-serif;color:#75816B">Gardenia · on the balcony</div>
+      </div>
+      <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#E4EDE2;border-radius:999px;font:700 11px Mulish,sans-serif;color:#2F6B4F;white-space:nowrap"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.4 6.6 5 9.2 9.6 3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>All good</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px">
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:16px;padding:11px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center">
+        <svg width="16" height="17" viewBox="0 0 12 13" fill="none"><path d="M6 1.4C6 1.4 2.6 5.4 2.6 8a3.4 3.4 0 0 0 6.8 0C9.4 5.4 6 1.4 6 1.4Z" stroke="#2F6B4F" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        <div style="font:700 9.5px Mulish,sans-serif;letter-spacing:.1em;color:#A3987C">WATER</div>
+        <div style="font:700 11.5px Mulish,sans-serif;color:#22372B;white-space:nowrap">Every 3 days</div>
+      </div>
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:16px;padding:11px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C4653F" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.2 5.2l1.7 1.7M17.1 17.1l1.7 1.7M18.8 5.2l-1.7 1.7M6.9 17.1l-1.7 1.7"/></svg>
+        <div style="font:700 9.5px Mulish,sans-serif;letter-spacing:.1em;color:#A3987C">LIGHT</div>
+        <div style="font:700 11.5px Mulish,sans-serif;color:#22372B;white-space:nowrap">Bright shade</div>
+      </div>
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:16px;padding:11px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2F6B4F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg>
+        <div style="font:700 9.5px Mulish,sans-serif;letter-spacing:.1em;color:#A3987C">SEASON</div>
+        <div style="font:700 11.5px Mulish,sans-serif;color:#22372B;white-space:nowrap">Loves summer</div>
+      </div>
+    </div>
+    <div style="background:#E4EDE2;border:1px solid #CFE0CE;border-radius:18px;padding:12px 13px;display:flex;align-items:center;gap:11px">
+      <div style="width:34px;height:34px;border-radius:50%;background:#2F6B4F;display:flex;align-items:center;justify-content:center;flex:none">
+        <svg width="14" height="15" viewBox="0 0 12 13" fill="none"><path d="M6 1.4C6 1.4 2.6 5.4 2.6 8a3.4 3.4 0 0 0 6.8 0C9.4 5.4 6 1.4 6 1.4Z" stroke="#FFFDF6" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="flex:1">
+        <div style="font:700 13.5px Mulish,sans-serif;color:#24543E">Next watering: Friday</div>
+        <div style="display:inline-flex;align-items:center;gap:4px;font:600 11px Mulish,sans-serif;color:#5C7263;margin-top:1px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a5.5 5.5 0 0 0-5.5 5.5c0 4-1.7 5.6-2.5 6.5h16c-.8-.9-2.5-2.5-2.5-6.5A5.5 5.5 0 0 0 12 4Z"/><path d="M10 19.5a2 2 0 0 0 4 0"/></svg>Push reminder at 7 PM</div>
+      </div>
+      <div style="padding:8px 14px;border-radius:999px;background:#2F6B4F;color:#FFFDF6;font:700 11.5px Mulish,sans-serif;cursor:pointer;white-space:nowrap" style-hover="background:#27593F">Mark watered</div>
+    </div>
+    <div style="font:700 10.5px Mulish,sans-serif;letter-spacing:.13em;color:#A3987C;padding:2px 4px 0">HEALTH TIMELINE</div>
+    <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:18px;padding:13px 14px 3px">
+      <div style="display:flex;gap:11px">
+        <div style="display:flex;flex-direction:column;align-items:center;width:10px"><div style="width:8px;height:8px;border-radius:50%;background:#2F6B4F;flex:none;margin-top:4px"></div><div style="width:2px;flex:1;background:#F1E8D4"></div></div>
+        <div style="flex:1;padding-bottom:12px">
+          <div style="display:flex;justify-content:space-between;gap:8px"><span style="font:700 12.5px Mulish,sans-serif;color:#22372B">New leaf unfurled</span><span style="font:600 11px Mulish,sans-serif;color:#A3987C;white-space:nowrap">Aug 2</span></div>
+          <div style="font:500 11.5px Mulish,sans-serif;color:#75816B;margin-top:1px">Photo added to the growth log</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:11px">
+        <div style="display:flex;flex-direction:column;align-items:center;width:10px"><div style="width:8px;height:8px;border-radius:50%;background:#C4653F;flex:none;margin-top:4px"></div><div style="width:2px;flex:1;background:#F1E8D4"></div></div>
+        <div style="flex:1;padding-bottom:12px">
+          <div style="display:flex;justify-content:space-between;gap:8px"><span style="font:700 12.5px Mulish,sans-serif;color:#22372B">Leaf spot treated</span><span style="font:600 11px Mulish,sans-serif;color:#A3987C;white-space:nowrap">Jul 26</span></div>
+          <div style="font:500 11.5px Mulish,sans-serif;color:#75816B;margin-top:1px">Caught early · <a href="#1d" style="color:#C4653F;font-weight:700;text-decoration:none">see diagnosis</a></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:11px">
+        <div style="display:flex;flex-direction:column;align-items:center;width:10px"><div style="width:8px;height:8px;border-radius:50%;background:#D8CCB2;flex:none;margin-top:4px"></div></div>
+        <div style="flex:1;padding-bottom:12px">
+          <div style="display:flex;justify-content:space-between;gap:8px"><span style="font:700 12.5px Mulish,sans-serif;color:#22372B">Added to your garden</span><span style="font:600 11px Mulish,sans-serif;color:#A3987C;white-space:nowrap">Jul 12</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="height:48px;border-radius:999px;background:#2F6B4F;color:#FFFDF6;font:700 14px Mulish,sans-serif;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;box-shadow:0 10px 20px rgba(47,107,79,.22);margin-top:2px" style-hover="background:#27593F">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="7" width="17.6" height="13" rx="3.2"/><circle cx="12" cy="13.2" r="3.7"/><path d="M8.6 7l1.7-2.3h3.4L15.4 7"/></svg>
+      Check health with a photo
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="2e" data-screen-label="Community feed">
+<div class="dv-olabel"><a class="dv-oid" href="#2e">2e</a>Community · local feed</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="height:100%;background:#F4EDDE;display:flex;flex-direction:column;font-family:Mulish,sans-serif">
+  <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+    <div style="padding:70px 20px 0;display:flex;align-items:center;justify-content:space-between">
+      <div style="font:600 24px 'Baloo 2',sans-serif;color:#22372B">Community</div>
+      <div style="padding:5px 12px;border-radius:999px;border:1.2px solid #D8CCB2;font:700 11px Mulish,sans-serif;color:#75816B;white-space:nowrap">Beirut &amp; the coast</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:9px;padding:13px 20px 0">
+      <div style="width:38px;height:38px;border-radius:50%;background:#E4EDE2;border:1px solid #CFE0CE;display:flex;align-items:center;justify-content:center;font:700 14px 'Baloo 2',sans-serif;color:#2F6B4F;flex:none">M</div>
+      <div style="flex:1;height:40px;border-radius:999px;background:#FFFDF6;border:1px solid #EBDFC8;display:flex;align-items:center;padding:0 15px;font:500 12.5px Mulish,sans-serif;color:#A3987C">Ask about a plant…</div>
+      <div style="width:40px;height:40px;border-radius:50%;background:#F6E3D7;display:flex;align-items:center;justify-content:center;flex:none;color:#C4653F;cursor:pointer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="7" width="17.6" height="13" rx="3.2"/><circle cx="12" cy="13.2" r="3.7"/><path d="M8.6 7l1.7-2.3h3.4L15.4 7"/></svg>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;padding:14px 20px 0">
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:20px;padding:12px 13px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <div style="width:34px;height:34px;border-radius:50%;background:#F6E3D7;display:flex;align-items:center;justify-content:center;font:700 13px 'Baloo 2',sans-serif;color:#C4653F;flex:none">R</div>
+          <div style="flex:1"><div style="font:700 12.5px Mulish,sans-serif;color:#22372B">Rana</div><div style="font:500 10.5px Mulish,sans-serif;color:#A3987C">Achrafieh · 2h ago</div></div>
+          <div style="padding:4px 12px;border-radius:999px;border:1.2px solid #2F6B4F;color:#2F6B4F;font:700 10.5px Mulish,sans-serif;cursor:pointer;white-space:nowrap" style-hover="background:#E4EDE2">Follow</div>
+        </div>
+        <div style="font:500 12.5px/1.5 Mulish,sans-serif;color:#3C4A3D;margin-top:8px">White spots on my za&rsquo;atar after last week&rsquo;s humidity. Anyone seen this?</div>
+        <div style="height:118px;margin-top:9px"><image-slot id="post-zaatar" radius="13" placeholder="za'atar photo"></image-slot></div>
+        <div style="display:flex;align-items:center;gap:15px;margin-top:9px">
+          <div style="display:inline-flex;align-items:center;gap:5px;font:700 11.5px Mulish,sans-serif;color:#75816B;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-9.3-9A5 5 0 0 1 12 6.4 5 5 0 0 1 21.3 11c-1.8 4.4-9.3 9-9.3 9Z"/></svg>12</div>
+          <div style="display:inline-flex;align-items:center;gap:5px;font:700 11.5px Mulish,sans-serif;color:#75816B;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.6c0 4-4 7.2-9 7.2-1 0-2-.1-2.9-.4L4 20l1.2-3.6C3.8 15.1 3 13.4 3 11.6c0-4 4-7.2 9-7.2s9 3.2 9 7.2Z"/></svg>4</div>
+        </div>
+        <div style="background:#F4EDDE;border-radius:12px;padding:8px 11px;margin-top:9px;font:500 11.5px/1.45 Mulish,sans-serif;color:#75816B"><span style="font-weight:700;color:#22372B">Karim</span> · Neem spray fixed the same thing on my thyme.</div>
+      </div>
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:20px;padding:12px 13px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <div style="width:34px;height:34px;border-radius:50%;background:#E4EDE2;display:flex;align-items:center;justify-content:center;font:700 13px 'Baloo 2',sans-serif;color:#2F6B4F;flex:none">K</div>
+          <div style="flex:1"><div style="font:700 12.5px Mulish,sans-serif;color:#22372B">Karim</div><div style="font:500 10.5px Mulish,sans-serif;color:#A3987C">Jounieh · 5h ago</div></div>
+          <div style="padding:4px 12px;border-radius:999px;background:#E4EDE2;color:#2F6B4F;font:700 10.5px Mulish,sans-serif;white-space:nowrap">Following</div>
+        </div>
+        <div style="font:500 12.5px/1.5 Mulish,sans-serif;color:#3C4A3D;margin-top:8px">Three summers of trying and the gardenia finally bloomed.</div>
+        <div style="height:118px;margin-top:9px"><image-slot id="post-gardenia" radius="13" placeholder="gardenia bloom photo"></image-slot></div>
+        <div style="display:flex;align-items:center;gap:15px;margin-top:9px">
+          <div style="display:inline-flex;align-items:center;gap:5px;font:700 11.5px Mulish,sans-serif;color:#C4653F;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="#C4653F" stroke="#C4653F" stroke-width="1.9" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-9.3-9A5 5 0 0 1 12 6.4 5 5 0 0 1 21.3 11c-1.8 4.4-9.3 9-9.3 9Z"/></svg>34</div>
+          <div style="display:inline-flex;align-items:center;gap:5px;font:700 11.5px Mulish,sans-serif;color:#75816B;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.6c0 4-4 7.2-9 7.2-1 0-2-.1-2.9-.4L4 20l1.2-3.6C3.8 15.1 3 13.4 3 11.6c0-4 4-7.2 9-7.2s9 3.2 9 7.2Z"/></svg>8</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="position:relative;background:#FFFDF6;border-top:1px solid #EBDFC8;display:flex;align-items:flex-end;justify-content:space-between;padding:10px 14px 24px;flex:none">
+    <div onClick="{{ setGardenComm }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cGardenComm }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Garden</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bGardenComm }};margin-top:1px"></div>
+    </div>
+    <div onClick="{{ setExploreComm }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cExploreComm }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.3"/><path d="M15.6 15.6 20.2 20.2"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Explore</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bExploreComm }};margin-top:1px"></div>
+    </div>
+    <div style="width:66px;height:46px;position:relative">
+      <div style="position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:#2F6B4F;border:5px solid #FFFDF6;box-shadow:0 10px 20px rgba(47,107,79,.35),inset 0 -3px 0 rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#27593F">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="7" width="17.6" height="13" rx="3.2"/><circle cx="12" cy="13.2" r="3.7"/><path d="M8.6 7l1.7-2.3h3.4L15.4 7"/></svg>
+      </div>
+    </div>
+    <div onClick="{{ setCommunityComm }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cCommunityComm }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.6" cy="9.6" r="3.1"/><path d="M3.2 19.3c.7-2.9 2.8-4.6 5.4-4.6s4.7 1.7 5.4 4.6"/><circle cx="16.6" cy="10.4" r="2.5"/><path d="M16.2 14.7c2.2.3 3.7 1.7 4.3 4"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Community</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bCommunityComm }};margin-top:1px"></div>
+    </div>
+    <div onClick="{{ setProfileComm }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cProfileComm }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.6" r="3.4"/><path d="M5.4 19.8c1-3.3 3.6-5 6.6-5s5.6 1.7 6.6 5"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Profile</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bProfileComm }};margin-top:1px"></div>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="2f" data-screen-label="Profile">
+<div class="dv-olabel"><a class="dv-oid" href="#2f">2f</a>Profile · settings and language</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="height:100%;background:#F4EDDE;display:flex;flex-direction:column;font-family:Mulish,sans-serif">
+  <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;align-items:center">
+    <div style="width:76px;height:76px;border-radius:50%;background:#E4EDE2;border:1px solid #CFE0CE;display:flex;align-items:center;justify-content:center;font:700 28px 'Baloo 2',sans-serif;color:#2F6B4F;margin-top:84px">M</div>
+    <div style="font:600 21px 'Baloo 2',sans-serif;color:#22372B;margin-top:10px">@maya.b</div>
+    <div style="font:500 12px Mulish,sans-serif;color:#75816B;margin-top:1px">Beirut · growing since 2024</div>
+    <div style="display:flex;align-items:center;gap:26px;margin-top:18px">
+      <div style="text-align:center"><div style="font:700 17px 'Baloo 2',sans-serif;color:#2F6B4F">6</div><div style="font:600 10.5px Mulish,sans-serif;color:#A3987C">Plants</div></div>
+      <div style="width:1px;height:26px;background:#E7DCC5"></div>
+      <div style="text-align:center"><div style="font:700 17px 'Baloo 2',sans-serif;color:#2F6B4F">128</div><div style="font:600 10.5px Mulish,sans-serif;color:#A3987C">Followers</div></div>
+      <div style="width:1px;height:26px;background:#E7DCC5"></div>
+      <div style="text-align:center"><div style="font:700 17px 'Baloo 2',sans-serif;color:#2F6B4F">89</div><div style="font:600 10.5px Mulish,sans-serif;color:#A3987C">Following</div></div>
+    </div>
+    <div style="align-self:stretch;background:#FFFDF6;border:1px solid #EFE5D0;border-radius:20px;margin:22px 20px 0;padding:2px 14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;border-bottom:1px solid #F1E8D4">
+        <div style="font:700 13px Mulish,sans-serif;color:#22372B">Language</div>
+        <div style="display:flex;gap:6px">
+          <div style="padding:4px 12px;border-radius:999px;background:#2F6B4F;color:#FFFDF6;font:700 10.5px Mulish,sans-serif;white-space:nowrap">English</div>
+          <div style="padding:3px 12px 5px;border-radius:999px;border:1.2px solid #D8CCB2;color:#75816B;font:500 11px 'Baloo Bhaijaan 2',sans-serif;white-space:nowrap;cursor:pointer">عربي</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;border-bottom:1px solid #F1E8D4">
+        <div>
+          <div style="font:700 13px Mulish,sans-serif;color:#22372B">Watering reminders</div>
+          <div style="font:500 10.5px Mulish,sans-serif;color:#A3987C">Push at 7 PM on watering days</div>
+        </div>
+        <div style="width:42px;height:25px;border-radius:999px;background:#2F6B4F;position:relative;flex:none;cursor:pointer"><div style="position:absolute;top:2.5px;right:2.5px;width:20px;height:20px;border-radius:50%;background:#FFFDF6;box-shadow:0 1px 3px rgba(34,55,43,.25)"></div></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;border-bottom:1px solid #F1E8D4">
+        <div style="font:700 13px Mulish,sans-serif;color:#22372B">Climate zone</div>
+        <div style="font:600 12px Mulish,sans-serif;color:#75816B;white-space:nowrap">Coastal · Beirut</div>
+      </div>
+      <div style="display:flex;align-items:center;min-height:50px">
+        <div style="font:700 13px Mulish,sans-serif;color:#C4653F;cursor:pointer">Sign out</div>
+      </div>
+    </div>
+  </div>
+  <div style="position:relative;background:#FFFDF6;border-top:1px solid #EBDFC8;display:flex;align-items:flex-end;justify-content:space-between;padding:10px 14px 24px;flex:none">
+    <div onClick="{{ setGardenProf }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cGardenProf }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Garden</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bGardenProf }};margin-top:1px"></div>
+    </div>
+    <div onClick="{{ setExploreProf }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cExploreProf }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.3"/><path d="M15.6 15.6 20.2 20.2"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Explore</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bExploreProf }};margin-top:1px"></div>
+    </div>
+    <div style="width:66px;height:46px;position:relative">
+      <div style="position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:#2F6B4F;border:5px solid #FFFDF6;box-shadow:0 10px 20px rgba(47,107,79,.35),inset 0 -3px 0 rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#27593F">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="7" width="17.6" height="13" rx="3.2"/><circle cx="12" cy="13.2" r="3.7"/><path d="M8.6 7l1.7-2.3h3.4L15.4 7"/></svg>
+      </div>
+    </div>
+    <div onClick="{{ setCommunityProf }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cCommunityProf }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.6" cy="9.6" r="3.1"/><path d="M3.2 19.3c.7-2.9 2.8-4.6 5.4-4.6s4.7 1.7 5.4 4.6"/><circle cx="16.6" cy="10.4" r="2.5"/><path d="M16.2 14.7c2.2.3 3.7 1.7 4.3 4"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Community</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bCommunityProf }};margin-top:1px"></div>
+    </div>
+    <div onClick="{{ setProfileProf }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cProfileProf }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.6" r="3.4"/><path d="M5.4 19.8c1-3.3 3.6-5 6.6-5s5.6 1.7 6.6 5"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Profile</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bProfileProf }};margin-top:1px"></div>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">Try next: &ldquo;Arabic RTL versions of turn 2&rdquo; · &ldquo;show the camera before capture&rdquo; · &ldquo;a notifications screen for reminders&rdquo;</p>
+</section>
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Flora: garden home, tab bar, diagnosis + Arabic RTL</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a" data-screen-label="Garden home">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Garden home · plant grid</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="height:100%;background:#F4EDDE;display:flex;flex-direction:column;font-family:Mulish,sans-serif">
+  <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+    <div style="padding:70px 20px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+      <div>
+        <div style="font:600 25px/1.15 'Baloo 2',sans-serif;color:#22372B">Good morning, Maya</div>
+      </div>
+      <div style="flex:none;margin-top:4px"><div style="width:42px;height:42px;border-radius:50%;background:#E4EDE2;border:1px solid #CFE0CE;display:flex;align-items:center;justify-content:center;font:700 16px 'Baloo 2',sans-serif;color:#2F6B4F">M</div></div>
+    </div>
+    <div style="display:flex;padding:13px 20px 0">
+      <div style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#FFFDF6;border:1px solid #EBDFC8;font:700 11px Mulish,sans-serif;color:#75816B;white-space:nowrap">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C4653F" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.2 5.2l1.7 1.7M17.1 17.1l1.7 1.7M18.8 5.2l-1.7 1.7M6.9 17.1l-1.7 1.7"/></svg>
+        Beirut · 31° sunny
+      </div>
+    </div>
+    <div style="display:flex;gap:7px;padding:15px 20px 0">
+      <div style="padding:6px 14px;border-radius:999px;background:#2F6B4F;color:#FFFDF6;font:700 12px Mulish,sans-serif;white-space:nowrap">All · 6</div>
+      <div style="padding:6px 14px;border-radius:999px;border:1.2px solid #D8CCB2;color:#75816B;font:600 12px Mulish,sans-serif">Balcony</div>
+      <div style="padding:6px 14px;border-radius:999px;border:1.2px solid #D8CCB2;color:#75816B;font:600 12px Mulish,sans-serif">Indoors</div>
+      <div style="padding:6px 14px;border-radius:999px;border:1.2px solid #D8CCB2;color:#75816B;font:600 12px Mulish,sans-serif">Herbs</div>
+    </div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;padding:18px 20px 0">
+      <div style="font:600 15px 'Baloo 2',sans-serif;color:#22372B">My garden</div>
+      <div style="font:700 12px Mulish,sans-serif;color:#C4653F;cursor:pointer;white-space:nowrap">+ Add plant</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;padding:11px 20px 0">
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:20px;padding:9px 9px 11px;display:flex;flex-direction:column;gap:8px">
+        <div style="height:108px"><image-slot id="plant-olive" radius="13" placeholder="olive tree"></image-slot></div>
+        <div style="padding:0 4px">
+          <div style="font:600 14.5px 'Baloo 2',sans-serif;color:#22372B">Zeitoun</div>
+          <div style="font:500 11.5px Mulish,sans-serif;color:#8A927E;margin-top:1px">Olive tree</div>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border:1.2px solid #2F6B4F;border-radius:999px;font:700 10.5px Mulish,sans-serif;color:#2F6B4F;white-space:nowrap;align-self:flex-start;margin:0 3px"><svg width="10" height="11" viewBox="0 0 12 13" fill="none"><path d="M6 1.4C6 1.4 2.6 5.4 2.6 8a3.4 3.4 0 0 0 6.8 0C9.4 5.4 6 1.4 6 1.4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Water in 2 days</div>
+      </div>
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:20px;padding:9px 9px 11px;display:flex;flex-direction:column;gap:8px">
+        <div style="height:108px"><image-slot id="plant-gardenia" radius="13" placeholder="gardenia"></image-slot></div>
+        <div style="padding:0 4px">
+          <div style="font:600 14.5px 'Baloo 2',sans-serif;color:#22372B">Fairuz</div>
+          <div style="font:500 11.5px Mulish,sans-serif;color:#8A927E;margin-top:1px">Gardenia</div>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:#C4653F;border-radius:999px;font:700 10.5px Mulish,sans-serif;color:#FFFDF6;white-space:nowrap;align-self:flex-start;margin:0 3px"><svg width="10" height="11" viewBox="0 0 12 13" fill="none"><path d="M6 1.4C6 1.4 2.6 5.4 2.6 8a3.4 3.4 0 0 0 6.8 0C9.4 5.4 6 1.4 6 1.4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Water today</div>
+      </div>
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:20px;padding:9px 9px 11px;display:flex;flex-direction:column;gap:8px">
+        <div style="height:108px"><image-slot id="plant-mint" radius="13" placeholder="mint"></image-slot></div>
+        <div style="padding:0 4px">
+          <div style="font:600 14.5px 'Baloo 2',sans-serif;color:#22372B">Na&rsquo;na&rsquo;</div>
+          <div style="font:500 11.5px Mulish,sans-serif;color:#8A927E;margin-top:1px">Mint</div>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:#E4EDE2;border-radius:999px;font:700 10.5px Mulish,sans-serif;color:#2F6B4F;white-space:nowrap;align-self:flex-start;margin:0 3px"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.4 6.6 5 9.2 9.6 3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>All good</div>
+      </div>
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:20px;padding:9px 9px 11px;display:flex;flex-direction:column;gap:8px">
+        <div style="height:108px"><image-slot id="plant-monstera" radius="13" placeholder="monstera"></image-slot></div>
+        <div style="padding:0 4px">
+          <div style="font:600 14.5px 'Baloo 2',sans-serif;color:#22372B">Dalal</div>
+          <div style="font:500 11.5px Mulish,sans-serif;color:#8A927E;margin-top:1px">Monstera</div>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border:1.2px solid #2F6B4F;border-radius:999px;font:700 10.5px Mulish,sans-serif;color:#2F6B4F;white-space:nowrap;align-self:flex-start;margin:0 3px"><svg width="10" height="11" viewBox="0 0 12 13" fill="none"><path d="M6 1.4C6 1.4 2.6 5.4 2.6 8a3.4 3.4 0 0 0 6.8 0C9.4 5.4 6 1.4 6 1.4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Water in 4 days</div>
+      </div>
+    </div>
+  </div>
+  <div style="position:relative;background:#FFFDF6;border-top:1px solid #EBDFC8;display:flex;align-items:flex-end;justify-content:space-between;padding:10px 14px 24px;flex:none">
+    <div onClick="{{ setGarden }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cGarden }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:700 10px Mulish,sans-serif;color:currentColor">Garden</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bGarden }};margin-top:1px"></div>
+    </div>
+    <div onClick="{{ setExplore }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cExplore }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.3"/><path d="M15.6 15.6 20.2 20.2"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Explore</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bExplore }};margin-top:1px"></div>
+    </div>
+    <div style="width:66px;height:46px;position:relative">
+      <div style="position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:#2F6B4F;border:5px solid #FFFDF6;box-shadow:0 10px 20px rgba(47,107,79,.35),inset 0 -3px 0 rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#27593F">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="7" width="17.6" height="13" rx="3.2"/><circle cx="12" cy="13.2" r="3.7"/><path d="M8.6 7l1.7-2.3h3.4L15.4 7"/></svg>
+      </div>
+    </div>
+    <div onClick="{{ setCommunity }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cCommunity }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.6" cy="9.6" r="3.1"/><path d="M3.2 19.3c.7-2.9 2.8-4.6 5.4-4.6s4.7 1.7 5.4 4.6"/><circle cx="16.6" cy="10.4" r="2.5"/><path d="M16.2 14.7c2.2.3 3.7 1.7 4.3 4"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Community</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bCommunity }};margin-top:1px"></div>
+    </div>
+    <div onClick="{{ setProfile }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cProfile }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.6" r="3.4"/><path d="M5.4 19.8c1-3.3 3.6-5 6.6-5s5.6 1.7 6.6 5"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Profile</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bProfile }};margin-top:1px"></div>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1b" data-screen-label="Garden home empty state">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Garden home · empty state</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="height:100%;background:#F4EDDE;display:flex;flex-direction:column;font-family:Mulish,sans-serif">
+  <div style="padding:70px 20px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+    <div>
+      <div style="font:600 25px/1.15 'Baloo 2',sans-serif;color:#22372B">Good morning, Maya</div>
+    </div>
+    <div style="flex:none;margin-top:4px"><div style="width:42px;height:42px;border-radius:50%;background:#E4EDE2;border:1px solid #CFE0CE;display:flex;align-items:center;justify-content:center;font:700 16px 'Baloo 2',sans-serif;color:#2F6B4F">M</div></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 34px;text-align:center;margin-top:-14px">
+    <div style="position:relative;width:190px;height:190px;margin-bottom:20px">
+      <div style="position:absolute;inset:10px;border-radius:50%;background:#EDE3CC"></div>
+      <div style="position:absolute;left:50%;margin-left:-21px;bottom:64px;width:42px;height:42px;background:#2F6B4F;border-radius:0 100% 0 100%;transform:rotate(45deg)"></div>
+      <div style="position:absolute;left:40px;bottom:60px;width:34px;height:34px;background:#5C8A6B;border-radius:0 100% 0 100%;transform:rotate(8deg)"></div>
+      <div style="position:absolute;right:40px;bottom:60px;width:34px;height:34px;background:#7FA98A;border-radius:0 100% 0 100%;transform:rotate(82deg)"></div>
+      <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:48px;width:96px;height:18px;border-radius:9px;background:#B85C38;z-index:2"></div>
+      <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:8px;width:78px;height:46px;border-radius:4px 4px 20px 20px;background:#C4653F"></div>
+      <div style="position:absolute;right:32px;top:30px;width:7px;height:7px;border-radius:50%;background:#C4653F"></div>
+      <div style="position:absolute;left:30px;top:44px;width:10px;height:10px;border-radius:50%;border:2px solid #C4653F"></div>
+    </div>
+    <div style="font:600 20px/1.25 'Baloo 2',sans-serif;color:#22372B;max-width:250px">Every jneineh starts with one pot</div>
+    <div style="font:500 13px/1.55 Mulish,sans-serif;color:#75816B;margin-top:9px;max-width:270px">Snap a photo and Flora will tell you what it is and how to keep it happy in Beirut weather.</div>
+    <div style="display:inline-flex;align-items:center;gap:9px;background:#2F6B4F;color:#FFFDF6;border-radius:999px;padding:15px 26px;font:700 15px Mulish,sans-serif;box-shadow:0 12px 24px rgba(47,107,79,.28);cursor:pointer;margin-top:22px" style-hover="background:#27593F">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="2.4" stroke-linecap="round"><path d="M12 4.5v15M4.5 12h15"/></svg>
+      Add your first plant
+    </div>
+    <div style="font:700 12.5px Mulish,sans-serif;color:#C4653F;margin-top:14px;cursor:pointer">Browse Lebanon favorites</div>
+  </div>
+  <div style="position:relative;background:#FFFDF6;border-top:1px solid #EBDFC8;display:flex;align-items:flex-end;justify-content:space-between;padding:10px 14px 24px;flex:none">
+    <div onClick="{{ setGarden }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cGarden }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:700 10px Mulish,sans-serif;color:currentColor">Garden</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bGarden }};margin-top:1px"></div>
+    </div>
+    <div onClick="{{ setExplore }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cExplore }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.3"/><path d="M15.6 15.6 20.2 20.2"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Explore</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bExplore }};margin-top:1px"></div>
+    </div>
+    <div style="width:66px;height:46px;position:relative">
+      <div style="position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:#2F6B4F;border:5px solid #FFFDF6;box-shadow:0 10px 20px rgba(47,107,79,.35),inset 0 -3px 0 rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#27593F">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="7" width="17.6" height="13" rx="3.2"/><circle cx="12" cy="13.2" r="3.7"/><path d="M8.6 7l1.7-2.3h3.4L15.4 7"/></svg>
+      </div>
+    </div>
+    <div onClick="{{ setCommunity }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cCommunity }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.6" cy="9.6" r="3.1"/><path d="M3.2 19.3c.7-2.9 2.8-4.6 5.4-4.6s4.7 1.7 5.4 4.6"/><circle cx="16.6" cy="10.4" r="2.5"/><path d="M16.2 14.7c2.2.3 3.7 1.7 4.3 4"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Community</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bCommunity }};margin-top:1px"></div>
+    </div>
+    <div onClick="{{ setProfile }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cProfile }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.6" r="3.4"/><path d="M5.4 19.8c1-3.3 3.6-5 6.6-5s5.6 1.7 6.6 5"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Profile</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bProfile }};margin-top:1px"></div>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1c" data-screen-label="Tab bar concept">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Tab bar · raised camera</div>
+<div style="width:430px;background:#FFFDF6;border:1px solid #EFE5D0;border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:18px;box-sizing:border-box">
+  <div style="background:#F4EDDE;border-radius:18px;padding-top:34px;overflow:hidden">
+    <div style="margin:0 18px 12px;height:12px;border-radius:6px;background:#E7DCC5;width:55%"></div>
+    <div style="margin:0 18px 30px;height:12px;border-radius:6px;background:#E7DCC5;width:35%"></div>
+    <div style="position:relative;background:#FFFDF6;border-top:1px solid #EBDFC8;display:flex;align-items:flex-end;justify-content:space-between;padding:10px 14px 20px">
+      <div onClick="{{ setGarden }}" style="width:64px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cGarden }}">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg>
+        <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:700 10px Mulish,sans-serif;color:currentColor">Garden</span></sc-if>
+        <div style="width:4px;height:4px;border-radius:50%;background:{{ bGarden }};margin-top:1px"></div>
+      </div>
+      <div onClick="{{ setExplore }}" style="width:64px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cExplore }}">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.3"/><path d="M15.6 15.6 20.2 20.2"/></svg>
+        <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Explore</span></sc-if>
+        <div style="width:4px;height:4px;border-radius:50%;background:{{ bExplore }};margin-top:1px"></div>
+      </div>
+      <div style="width:64px;height:46px;position:relative">
+        <div style="position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:#2F6B4F;border:5px solid #FFFDF6;box-shadow:0 10px 20px rgba(47,107,79,.35),inset 0 -3px 0 rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#27593F">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="7" width="17.6" height="13" rx="3.2"/><circle cx="12" cy="13.2" r="3.7"/><path d="M8.6 7l1.7-2.3h3.4L15.4 7"/></svg>
+        </div>
+      </div>
+      <div onClick="{{ setCommunity }}" style="width:64px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cCommunity }}">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.6" cy="9.6" r="3.1"/><path d="M3.2 19.3c.7-2.9 2.8-4.6 5.4-4.6s4.7 1.7 5.4 4.6"/><circle cx="16.6" cy="10.4" r="2.5"/><path d="M16.2 14.7c2.2.3 3.7 1.7 4.3 4"/></svg>
+        <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Community</span></sc-if>
+        <div style="width:4px;height:4px;border-radius:50%;background:{{ bCommunity }};margin-top:1px"></div>
+      </div>
+      <div onClick="{{ setProfile }}" style="width:64px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:{{ cProfile }}">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.6" r="3.4"/><path d="M5.4 19.8c1-3.3 3.6-5 6.6-5s5.6 1.7 6.6 5"/></svg>
+        <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:600 10px Mulish,sans-serif;color:currentColor">Profile</span></sc-if>
+        <div style="width:4px;height:4px;border-radius:50%;background:{{ bProfile }};margin-top:1px"></div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:7px;font:11px/1.5 ui-monospace,Menlo,monospace;color:#75816B;padding:0 4px">
+    <div><span style="color:#2F6B4F;font-weight:700">camera&nbsp;&nbsp;</span>60px circle · raised 22px · 5px cream ring</div>
+    <div><span style="color:#2F6B4F;font-weight:700">active&nbsp;&nbsp;</span>Deep Green #2F6B4F · 4px dot below label</div>
+    <div><span style="color:#2F6B4F;font-weight:700">resting&nbsp;</span>Sage #A3AC9B · no dot · same 66px hit area</div>
+    <div><span style="color:#2F6B4F;font-weight:700">bar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>Cream #FFFDF6 · hairline top #EBDFC8 · sits on sand</div>
+    <div><span style="color:#2F6B4F;font-weight:700">tap&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>every tab is tappable, try switching the active state</div>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="1d" data-screen-label="Diagnosis result">
+<div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Diagnosis result</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="height:100%;background:#F4EDDE;display:flex;flex-direction:column;font-family:Mulish,sans-serif">
+  <div style="position:relative;height:238px;flex:none">
+    <image-slot id="diag-photo" shape="rect" placeholder="gardenia leaf closeup"></image-slot>
+    <div style="position:absolute;top:64px;left:14px;width:36px;height:36px;border-radius:50%;background:rgba(255,253,246,.88);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(34,55,43,.18)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22372B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 7.5 12l7 7"/></svg>
+    </div>
+    <div style="position:absolute;right:14px;bottom:42px;padding:5px 11px;border-radius:999px;background:rgba(34,55,43,.6);color:#FFFDF6;font:700 11px Mulish,sans-serif;pointer-events:none;white-space:nowrap">Fairuz · Gardenia</div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;padding:0 14px 16px;margin-top:-26px;position:relative;z-index:2;gap:11px;overflow:hidden">
+    <sc-if value="{{ needsCare }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#F6E3D7;border:1px solid #ECD2BE;border-radius:18px;padding:13px 14px;display:flex;gap:11px;align-items:center;box-shadow:0 6px 18px rgba(34,55,43,.07)">
+        <div style="width:34px;height:34px;border-radius:50%;background:#C4653F;display:flex;align-items:center;justify-content:center;flex:none">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="2.2" stroke-linecap="round"><path d="M12 6.5v6"/><circle cx="12" cy="16.8" r="1.3" fill="#FFFDF6" stroke="none"/></svg>
+        </div>
+        <div>
+          <div style="font:600 16px 'Baloo 2',sans-serif;color:#8F4526">Needs a little care</div>
+          <div style="font:500 12px Mulish,sans-serif;color:#A9663F;margin-top:2px">Likely a leaf fungus, caught early.</div>
+        </div>
+      </div>
+      <div style="font:700 10.5px Mulish,sans-serif;letter-spacing:.13em;color:#A3987C;padding:2px 4px 0">WHAT WE FOUND</div>
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:18px;padding:3px 14px">
+        <div style="padding:10px 0;border-bottom:1px solid #F1E8D4">
+          <div style="display:flex;justify-content:space-between;font:600 13px Mulish,sans-serif;color:#22372B"><span>Leaf spot (fungal)</span><span style="color:#C4653F;font-weight:700">82%</span></div>
+          <div style="height:5px;border-radius:99px;background:#EFE5D0;margin-top:7px"><div style="height:5px;width:82%;border-radius:99px;background:#C4653F"></div></div>
+        </div>
+        <div style="padding:10px 0;border-bottom:1px solid #F1E8D4">
+          <div style="display:flex;justify-content:space-between;font:600 13px Mulish,sans-serif;color:#22372B"><span>Overwatering</span><span style="color:#D08A5C;font-weight:700">61%</span></div>
+          <div style="height:5px;border-radius:99px;background:#EFE5D0;margin-top:7px"><div style="height:5px;width:61%;border-radius:99px;background:#D08A5C"></div></div>
+        </div>
+        <div style="padding:10px 0">
+          <div style="display:flex;justify-content:space-between;font:600 13px Mulish,sans-serif;color:#22372B"><span>Spider mites</span><span style="color:#75816B;font-weight:700">24%</span></div>
+          <div style="height:5px;border-radius:99px;background:#EFE5D0;margin-top:7px"><div style="height:5px;width:24%;border-radius:99px;background:#9DB5A4"></div></div>
+        </div>
+      </div>
+      <div style="font:700 10.5px Mulish,sans-serif;letter-spacing:.13em;color:#A3987C;padding:2px 4px 0">TREATMENT PLAN</div>
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:18px;padding:5px 14px">
+        <div style="display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #F1E8D4">
+          <div style="width:24px;height:24px;border-radius:50%;background:#E4EDE2;color:#2F6B4F;font:700 11.5px Mulish,sans-serif;display:flex;align-items:center;justify-content:center;flex:none">1</div>
+          <div style="font:500 12.5px/1.5 Mulish,sans-serif;color:#3C4A3D">Snip off the spotted leaves with clean scissors.</div>
+        </div>
+        <div style="display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #F1E8D4">
+          <div style="width:24px;height:24px;border-radius:50%;background:#E4EDE2;color:#2F6B4F;font:700 11.5px Mulish,sans-serif;display:flex;align-items:center;justify-content:center;flex:none">2</div>
+          <div style="font:500 12.5px/1.5 Mulish,sans-serif;color:#3C4A3D">Skip watering for 3 to 4 days and let the soil dry out.</div>
+        </div>
+        <div style="display:flex;gap:11px;align-items:flex-start;padding:9px 0">
+          <div style="width:24px;height:24px;border-radius:50%;background:#E4EDE2;color:#2F6B4F;font:700 11.5px Mulish,sans-serif;display:flex;align-items:center;justify-content:center;flex:none">3</div>
+          <div style="font:500 12.5px/1.5 Mulish,sans-serif;color:#3C4A3D">Give her airflow. Muggy Beirut air feeds the fungus.</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:2px">
+        <div style="height:48px;border-radius:999px;background:#2F6B4F;color:#FFFDF6;font:700 14.5px Mulish,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 20px rgba(47,107,79,.22)" style-hover="background:#27593F">Start care plan</div>
+        <div style="height:44px;border-radius:999px;border:1.6px solid #C4653F;color:#C4653F;font:700 13.5px Mulish,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer" style-hover="background:#F6E3D7">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.6c0 4-4 7.2-9 7.2-1 0-2-.1-2.9-.4L4 20l1.2-3.6C3.8 15.1 3 13.4 3 11.6c0-4 4-7.2 9-7.2s9 3.2 9 7.2Z"/><circle cx="8.5" cy="11.6" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="11.6" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="11.6" r="1" fill="currentColor" stroke="none"/></svg>
+          Ask the community
+        </div>
+        <div style="font:500 10.5px Mulish,sans-serif;color:#A3987C;text-align:center">Lebanese growers usually reply within the hour.</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ healthy }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#E4EDE2;border:1px solid #CFE0CE;border-radius:18px;padding:13px 14px;display:flex;gap:11px;align-items:center;box-shadow:0 6px 18px rgba(34,55,43,.07)">
+        <div style="width:34px;height:34px;border-radius:50%;background:#2F6B4F;display:flex;align-items:center;justify-content:center;flex:none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        </div>
+        <div>
+          <div style="font:600 16px 'Baloo 2',sans-serif;color:#24543E">Fairuz is thriving</div>
+          <div style="font:500 12px Mulish,sans-serif;color:#5C7263;margin-top:2px">No issues found. Keep it up.</div>
+        </div>
+      </div>
+      <div style="font:700 10.5px Mulish,sans-serif;letter-spacing:.13em;color:#A3987C;padding:2px 4px 0">ALL CLEAR</div>
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:18px;padding:5px 14px">
+        <div style="padding:11px 0;border-bottom:1px solid #F1E8D4;font:500 12.5px/1.5 Mulish,sans-serif;color:#3C4A3D">Leaves, stem and soil all look healthy.</div>
+        <div style="padding:11px 0;font:500 12.5px/1.5 Mulish,sans-serif;color:#3C4A3D">Next check up in 2 weeks. Flora will remind you.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:2px">
+        <div style="height:48px;border-radius:999px;background:#2F6B4F;color:#FFFDF6;font:700 14.5px Mulish,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 20px rgba(47,107,79,.22)" style-hover="background:#27593F">Add to Fairuz&rsquo;s log</div>
+        <div style="height:44px;border-radius:999px;border:1.6px solid #C4653F;color:#C4653F;font:700 13.5px Mulish,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer" style-hover="background:#F6E3D7">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.6c0 4-4 7.2-9 7.2-1 0-2-.1-2.9-.4L4 20l1.2-3.6C3.8 15.1 3 13.4 3 11.6c0-4 4-7.2 9-7.2s9 3.2 9 7.2Z"/><circle cx="8.5" cy="11.6" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="11.6" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="11.6" r="1" fill="currentColor" stroke="none"/></svg>
+          Ask the community
+        </div>
+        <div style="font:500 10.5px Mulish,sans-serif;color:#A3987C;text-align:center">Lebanese growers usually reply within the hour.</div>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1e" data-screen-label="Garden home Arabic RTL">
+<div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Arabic RTL variant of <a class="dv-oid" href="#1a">1a</a></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div dir="rtl" style="height:100%;background:#F4EDDE;display:flex;flex-direction:column;font-family:'Baloo Bhaijaan 2',sans-serif">
+  <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+    <div style="padding:70px 20px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+      <div>
+        <div style="font:700 25px/1.3 'Baloo Bhaijaan 2',sans-serif;color:#22372B">صباح الخير يا مايا</div>
+      </div>
+      <div style="flex:none;margin-top:4px"><div style="width:42px;height:42px;border-radius:50%;background:#E4EDE2;border:1px solid #CFE0CE;display:flex;align-items:center;justify-content:center;font:700 16px 'Baloo 2',sans-serif;color:#2F6B4F">M</div></div>
+    </div>
+    <div style="display:flex;padding:12px 20px 0">
+      <div style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#FFFDF6;border:1px solid #EBDFC8;font:700 11.5px 'Baloo Bhaijaan 2',sans-serif;color:#75816B;white-space:nowrap">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C4653F" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.2 5.2l1.7 1.7M17.1 17.1l1.7 1.7M18.8 5.2l-1.7 1.7M6.9 17.1l-1.7 1.7"/></svg>
+        بيروت · ٣١ درجة ومشمس
+      </div>
+    </div>
+    <div style="display:flex;gap:7px;padding:14px 20px 0">
+      <div style="padding:5px 14px 7px;border-radius:999px;background:#2F6B4F;color:#FFFDF6;font:700 12.5px 'Baloo Bhaijaan 2',sans-serif;white-space:nowrap">الكل · ٦</div>
+      <div style="padding:5px 14px 7px;border-radius:999px;border:1.2px solid #D8CCB2;color:#75816B;font:500 12.5px 'Baloo Bhaijaan 2',sans-serif">البلكون</div>
+      <div style="padding:5px 14px 7px;border-radius:999px;border:1.2px solid #D8CCB2;color:#75816B;font:500 12.5px 'Baloo Bhaijaan 2',sans-serif">جوّا</div>
+      <div style="padding:5px 14px 7px;border-radius:999px;border:1.2px solid #D8CCB2;color:#75816B;font:500 12.5px 'Baloo Bhaijaan 2',sans-serif">أعشاب</div>
+    </div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;padding:16px 20px 0">
+      <div style="font:700 15.5px 'Baloo Bhaijaan 2',sans-serif;color:#22372B">حديقتي</div>
+      <div style="font:700 12.5px 'Baloo Bhaijaan 2',sans-serif;color:#C4653F;cursor:pointer;white-space:nowrap">+ أضف نبتة</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;padding:10px 20px 0">
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:20px;padding:9px 9px 11px;display:flex;flex-direction:column;gap:7px">
+        <div style="height:108px"><image-slot id="plant-olive" radius="13" placeholder="صورة الزيتونة"></image-slot></div>
+        <div style="padding:0 4px">
+          <div style="font:700 14.5px 'Baloo Bhaijaan 2',sans-serif;color:#22372B">زيتون</div>
+          <div style="font:500 11.5px 'Baloo Bhaijaan 2',sans-serif;color:#8A927E">زيتونة بلدية</div>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px 5px;border:1.2px solid #2F6B4F;border-radius:999px;font:700 11px 'Baloo Bhaijaan 2',sans-serif;color:#2F6B4F;white-space:nowrap;align-self:flex-start;margin:0 3px"><svg width="10" height="11" viewBox="0 0 12 13" fill="none"><path d="M6 1.4C6 1.4 2.6 5.4 2.6 8a3.4 3.4 0 0 0 6.8 0C9.4 5.4 6 1.4 6 1.4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>الريّ بعد يومين</div>
+      </div>
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:20px;padding:9px 9px 11px;display:flex;flex-direction:column;gap:7px">
+        <div style="height:108px"><image-slot id="plant-gardenia" radius="13" placeholder="صورة الغاردينيا"></image-slot></div>
+        <div style="padding:0 4px">
+          <div style="font:700 14.5px 'Baloo Bhaijaan 2',sans-serif;color:#22372B">فيروز</div>
+          <div style="font:500 11.5px 'Baloo Bhaijaan 2',sans-serif;color:#8A927E">غاردينيا</div>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px 6px;background:#C4653F;border-radius:999px;font:700 11px 'Baloo Bhaijaan 2',sans-serif;color:#FFFDF6;white-space:nowrap;align-self:flex-start;margin:0 3px"><svg width="10" height="11" viewBox="0 0 12 13" fill="none"><path d="M6 1.4C6 1.4 2.6 5.4 2.6 8a3.4 3.4 0 0 0 6.8 0C9.4 5.4 6 1.4 6 1.4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>اسقيها اليوم</div>
+      </div>
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:20px;padding:9px 9px 11px;display:flex;flex-direction:column;gap:7px">
+        <div style="height:108px"><image-slot id="plant-mint" radius="13" placeholder="صورة النعناع"></image-slot></div>
+        <div style="padding:0 4px">
+          <div style="font:700 14.5px 'Baloo Bhaijaan 2',sans-serif;color:#22372B">نعناع</div>
+          <div style="font:500 11.5px 'Baloo Bhaijaan 2',sans-serif;color:#8A927E">نعناع بلدي</div>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px 6px;background:#E4EDE2;border-radius:999px;font:700 11px 'Baloo Bhaijaan 2',sans-serif;color:#2F6B4F;white-space:nowrap;align-self:flex-start;margin:0 3px"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.4 6.6 5 9.2 9.6 3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>كلّو تمام</div>
+      </div>
+      <div style="background:#FFFDF6;border:1px solid #EFE5D0;border-radius:20px;padding:9px 9px 11px;display:flex;flex-direction:column;gap:7px">
+        <div style="height:108px"><image-slot id="plant-monstera" radius="13" placeholder="صورة المونستيرا"></image-slot></div>
+        <div style="padding:0 4px">
+          <div style="font:700 14.5px 'Baloo Bhaijaan 2',sans-serif;color:#22372B">دلال</div>
+          <div style="font:500 11.5px 'Baloo Bhaijaan 2',sans-serif;color:#8A927E">مونستيرا</div>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px 5px;border:1.2px solid #2F6B4F;border-radius:999px;font:700 11px 'Baloo Bhaijaan 2',sans-serif;color:#2F6B4F;white-space:nowrap;align-self:flex-start;margin:0 3px"><svg width="10" height="11" viewBox="0 0 12 13" fill="none"><path d="M6 1.4C6 1.4 2.6 5.4 2.6 8a3.4 3.4 0 0 0 6.8 0C9.4 5.4 6 1.4 6 1.4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>الريّ بعد ٤ أيام</div>
+      </div>
+    </div>
+  </div>
+  <div style="position:relative;background:#FFFDF6;border-top:1px solid #EBDFC8;display:flex;align-items:flex-end;justify-content:space-between;padding:10px 14px 24px;flex:none">
+    <div onClick="{{ setGarden }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:{{ cGarden }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-8.3"/><path d="M12 13.2C12 9.8 9.4 7.3 5.8 7.3c0 3.4 2.6 5.9 6.2 5.9Z"/><path d="M12 10.6c0-2.9 2.2-4.9 5.7-4.9 0 2.9-2.2 4.9-5.7 4.9Z"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:700 10.5px 'Baloo Bhaijaan 2',sans-serif;color:currentColor">حديقتي</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bGarden }};margin-top:1px"></div>
+    </div>
+    <div onClick="{{ setExplore }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:{{ cExplore }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.3"/><path d="M15.6 15.6 20.2 20.2"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:500 10.5px 'Baloo Bhaijaan 2',sans-serif;color:currentColor">اكتشف</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bExplore }};margin-top:1px"></div>
+    </div>
+    <div style="width:66px;height:46px;position:relative">
+      <div style="position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:#2F6B4F;border:5px solid #FFFDF6;box-shadow:0 10px 20px rgba(47,107,79,.35),inset 0 -3px 0 rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#27593F">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFDF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="7" width="17.6" height="13" rx="3.2"/><circle cx="12" cy="13.2" r="3.7"/><path d="M8.6 7l1.7-2.3h3.4L15.4 7"/></svg>
+      </div>
+    </div>
+    <div onClick="{{ setCommunity }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:{{ cCommunity }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.6" cy="9.6" r="3.1"/><path d="M3.2 19.3c.7-2.9 2.8-4.6 5.4-4.6s4.7 1.7 5.4 4.6"/><circle cx="16.6" cy="10.4" r="2.5"/><path d="M16.2 14.7c2.2.3 3.7 1.7 4.3 4"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:500 10.5px 'Baloo Bhaijaan 2',sans-serif;color:currentColor">المجتمع</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bCommunity }};margin-top:1px"></div>
+    </div>
+    <div onClick="{{ setProfile }}" style="width:66px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:{{ cProfile }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.6" r="3.4"/><path d="M5.4 19.8c1-3.3 3.6-5 6.6-5s5.6 1.7 6.6 5"/></svg>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font:500 10.5px 'Baloo Bhaijaan 2',sans-serif;color:currentColor">حسابي</span></sc-if>
+      <div style="width:4px;height:4px;border-radius:50%;background:{{ bProfile }};margin-top:1px"></div>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">Try next: &ldquo;make <a class="dv-oid" href="#1d">1d</a> show the healthy state by default&rdquo; · &ldquo;riff <a class="dv-oid" href="#1a">1a</a> as a list layout&rdquo; · &ldquo;RTL version of the diagnosis screen too&rdquo;</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showTabLabels&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Tab bar&quot;},&quot;diagnosisState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;needs care&quot;,&quot;options&quot;:[&quot;needs care&quot;,&quot;healthy&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Diagnosis&quot;}}">
+class Component extends DCLogic {
+  state = { tab: 'garden', tabAdd: 'explore', tabComm: 'community', tabProf: 'profile' };
+  renderVals() {
+    const st = this.props.diagnosisState ?? 'needs care';
+    const out = {
+      showLabels: this.props.showTabLabels ?? true,
+      needsCare: st !== 'healthy',
+      healthy: st === 'healthy',
+    };
+    const bars = { '': 'tab', Add: 'tabAdd', Comm: 'tabComm', Prof: 'tabProf' };
+    for (const sfx of Object.keys(bars)) {
+      const key = bars[sfx];
+      for (const k of ['garden', 'explore', 'community', 'profile']) {
+        const K = k[0].toUpperCase() + k.slice(1);
+        out['c' + K + sfx] = this.state[key] === k ? '#2F6B4F' : '#A3AC9B';
+        out['b' + K + sfx] = this.state[key] === k ? '#2F6B4F' : 'transparent';
+        out['set' + K + sfx] = () => this.setState({ [key]: k });
+      }
+    }
+    return out;
+  }
+}
+</script>
+</body>
+</html>

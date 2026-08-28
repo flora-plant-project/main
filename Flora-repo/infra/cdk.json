@@ -1,0 +1,7 @@
+{
+  "app": "node bin/flora.js",
+  "watch": { "include": ["bin/**", "src/**"] },
+  "context": {
+    "@aws-cdk/core:newStyleStackSynthesis": true
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "access_token": "fixture_diseased_tomato",
+  "model_version": "plant_id:3.7.1",
+  "input": { "health": "all", "similar_images": false },
+  "result": {
+    "is_plant": { "probability": 0.997, "binary": true, "threshold": 0.5 },
+    "is_healthy": { "probability": 0.13, "binary": false, "threshold": 0.525 },
+    "classification": {
+      "suggestions": [
+        {
+          "id": "fixture-tomato",
+          "name": "Solanum lycopersicum",
+          "probability": 0.88,
+          "details": {
+            "common_names": ["Tomato", "Garden tomato"],
+            "url": "https://en.wikipedia.org/wiki/Tomato"
+          }
+        }
+      ]
+    },
+    "disease": {
+      "suggestions": [
+        {
+          "id": "fixture-early-blight",
+          "name": "Alternaria solani (early blight)",
+          "probability": 0.81,
+          "details": {
+            "language": "en",
+            "treatment": {
+              "prevention": [
+                "Water at the base and keep the foliage dry",
+                "Rotate crops so tomatoes do not follow tomatoes"
+              ],
+              "biological": ["Remove and destroy the affected lower leaves"],
+              "chemical": ["Apply a copper-based fungicide every 7-10 days"]
+            }
+          }
+        },
+        {
+          "id": "fixture-nitrogen",
+          "name": "nutrient deficiency",
+          "probability": 0.22,
+          "details": {
+            "language": "en",
+            "treatment": {
+              "prevention": ["Feed with a balanced fertilizer every two weeks"]
+            }
+          }
+        },
+        {
+          "id": "fixture-noise",
+          "name": "mechanical damage",
+          "probability": 0.03,
+          "details": { "treatment": {} }
+        }
+      ]
+    }
+  }
+}

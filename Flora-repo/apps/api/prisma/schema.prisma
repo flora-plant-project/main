@@ -1,0 +1,289 @@
+// Flora — data model.
+//
+// Shapes here mirror the client contract in apps/mobile/src/api/index.js one for
+// one, because the same behavioural suite (client.contract.test.js) runs against
+// both the mock client and the live API. Where the mock stores a plain object,
+// this stores a row; the view the service returns must match the mock's exactly.
+//
+// JSON columns (care, zoneMultipliers, attachment, result) hold shapes that
+// packages/shared already validates with zod at the edge. They are payloads the
+// API never queries into, so a column per field would buy nothing.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------- enums
+
+/// Lebanese climate zones. Scales every watering interval — see Species.zoneMultipliers.
+enum ClimateZone {
+  COASTAL
+  MOUNTAIN
+  BEKAA
+  SOUTH
+}
+
+enum ScheduleType {
+  WATER
+  FERTILIZE
+  SEASONAL
+}
+
+enum PostType {
+  GENERAL
+  HELP
+}
+
+/// PENDING_REVIEW posts are visible to their author only (see the feed service).
+enum PostStatus {
+  PUBLISHED
+  PENDING_REVIEW
+}
+
+/// Lifecycle of a recognition run. `create` writes PENDING and returns; the
+/// client polls until it flips. Same contract a queue would expose, which is what
+/// keeps the later move to SQS + Lambda off the client.
+enum DiagnosisStatus {
+  PENDING
+  COMPLETE
+  FAILED
+}
+
+/// Lowercase to match the wire values in RegisterDeviceSchema.
+enum DevicePlatform {
+  android
+  ios
+}
+
+// ---------------------------------------------------------------- identity
+
+model User {
+  id           String      @id @default(cuid())
+  username     String      @unique
+  passwordHash String
+  displayName  String
+  climateZone  ClimateZone @default(COASTAL)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  sessions  Session[]
+  plants    Plant[]
+  diagnoses Diagnosis[]
+  posts     Post[]
+  comments  Comment[]
+  likes     Like[]
+  devices   Device[]
+  following Follow[]    @relation("Follower")
+  followers Follow[]    @relation("Followee")
+}
+
+/// Opaque bearer tokens. The token IS the primary key — a lookup is the auth
+/// check, and logout is a delete, so a revoked token cannot outlive the row.
+/// Deliberately not a JWT: revocation matters more here than statelessness, and
+/// the mock's session model is exactly this.
+model Session {
+  token     String   @id
+  userId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------- catalog
+
+/// Cached species taxonomy + care data, shared across users.
+///
+/// `zoneMultipliers` scales `care.waterEveryDays` per climate zone: cool mountain
+/// air stretches the interval (>1), the hot dry Bekaa shortens it (<1).
+model Species {
+  id             String   @id @default(cuid())
+  scientificName String   @unique
+  /// Curator's order, mirroring the shared seed. Exists so the live API lists the
+  /// catalog in exactly the order the mock client does — the contract suite runs
+  /// against both, and an alphabetical fallback would silently diverge.
+  sortOrder      Int      @default(0)
+  /// Mixed English and Arabic; species search matches substrings across all of them.
+  commonNames    String[]
+  /// { waterEveryDays: number, sun: string, tempC: { min: number, max: number } }
+  care           Json
+  /// { COASTAL: number, MOUNTAIN: number, BEKAA: number, SOUTH: number }
+  zoneMultipliers Json
+
+  plants Plant[]
+}
+
+// ---------------------------------------------------------------- garden
+
+model Plant {
+  id       String  @id @default(cuid())
+  ownerId  String
+  nickname String
+  /// Null when the plant was added by a nickname the catalog does not know.
+  speciesId String?
+  photoKey String?
+  /// Denormalised from the watering history so the garden list renders without
+  /// a per-plant subquery. markWatered is the only writer.
+  lastWateredAt DateTime?
+  nextDueAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  owner      User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  species    Species?    @relation(fields: [speciesId], references: [id], onDelete: SetNull)
+  schedules  Schedule[]
+  growthLogs GrowthLog[]
+  diagnoses  Diagnosis[]
+
+  @@index([ownerId])
+  @@index([speciesId])
+}
+
+/// At most one schedule per (plant, type): setting a new interval replaces the
+/// old one rather than stacking duplicates. The unique index is what makes the
+/// service's upsert safe under concurrent writes.
+model Schedule {
+  id           String       @id @default(cuid())
+  plantId      String
+  type         ScheduleType
+  /// Null for SEASONAL, which has no fixed cadence.
+  intervalDays Int?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+
+  @@unique([plantId, type])
+}
+
+model GrowthLog {
+  id        String   @id @default(cuid())
+  plantId   String
+  photoKey  String?
+  note      String?
+  createdAt DateTime @default(now())
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+
+  @@index([plantId, createdAt])
+}
+
+// ---------------------------------------------------------------- diagnosis
+
+/// One recognition run.
+///
+/// `plantId` is nullable and set later by `attach` — a scan starts before the
+/// user has decided which plant (if any) it belongs to.
+model Diagnosis {
+  id      String  @id @default(cuid())
+  userId  String?
+  plantId String?
+  /// Storage key of the scanned photo (uploads/<year>/<uuid>.jpg), or a bundled
+  /// demo asset path in seeded rows. Never a URL: views expand it at read time,
+  /// so the CDN domain lives in configuration and not in this table.
+  imageKey String?
+  mode     String?
+  status   DiagnosisStatus @default(PENDING)
+  /// RecognitionResult: { species: SpeciesCandidate[], health: HealthAssessment }
+  result   Json?
+  /// health.confidence < LOW_CONFIDENCE_THRESHOLD. Null while PENDING.
+  lowConfidence Boolean?
+  /// { code, message } on FAILED.
+  error         Json?
+  createdAt     DateTime  @default(now())
+  completedAt   DateTime?
+
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  plant Plant? @relation(fields: [plantId], references: [id], onDelete: SetNull)
+
+  @@index([plantId, createdAt])
+  @@index([userId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------- community
+
+model Post {
+  id       String     @id @default(cuid())
+  authorId String
+  type     PostType   @default(GENERAL)
+  body     String
+  images   String[]
+  /// Set when a post came from an escalated diagnosis:
+  /// { imageUri, topIssue, confidence }.
+  attachment Json?
+  status     PostStatus @default(PUBLISHED)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments Comment[]
+  likes    Like[]
+
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
+  @@index([authorId])
+}
+
+/// Composite primary key, so liking twice is a no-op rather than a duplicate row.
+model Like {
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@index([userId])
+}
+
+/// Self-referential follow graph. Self-follow is rejected in the service —
+/// Postgres cannot express `followerId <> followeeId` through Prisma.
+model Follow {
+  followerId String
+  followeeId String
+  createdAt  DateTime @default(now())
+
+  follower User @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  followee User @relation("Followee", fields: [followeeId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followeeId])
+  @@index([followeeId])
+}
+
+// ---------------------------------------------------------------- notifications
+
+/// Push tokens for the reminder dispatcher (services/workers). Unique per
+/// (user, token) so re-registering the same device updates rather than stacks.
+model Device {
+  id        String         @id @default(cuid())
+  userId    String
+  pushToken String
+  platform  DevicePlatform
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pushToken])
+}

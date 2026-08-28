@@ -1,0 +1,17 @@
+{
+  "name": "@flora/infra",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "@flora/shared": "workspace:*",
+    "aws-cdk-lib": "^2.266.0",
+    "constructs": "^10.8.1"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "summary": "Your tomato has early blight, a fungal disease that starts on the oldest leaves and works its way up. It is very treatable at this stage, but the sharp day-to-night temperature swing here leaves dew on the foliage every morning, which is exactly what the fungus needs to spread.",
+  "steps": [
+    {
+      "action": "Cut off every leaf showing brown target-shaped spots, along with the bare lower stems. Bag them and bin them — do not compost.",
+      "when": "Today",
+      "why": "Spores survive on fallen leaves and splash back up onto the plant with the next watering."
+    },
+    {
+      "action": "Water at the soil line only, early in the morning.",
+      "when": "From the next watering onward",
+      "why": "Morning water lets the leaves dry before nightfall. Evening or overhead watering keeps them wet right through the dew hours."
+    },
+    {
+      "action": "Spread about 5cm of straw mulch over the soil around the base.",
+      "when": "This week",
+      "why": "It blocks soil splash, which is the main route spores travel back onto the lower leaves."
+    },
+    {
+      "action": "Apply a copper-based fungicide, repeating every 7-10 days while symptoms are active.",
+      "when": "After pruning, on a still evening",
+      "why": "Copper is protective rather than curative — it shields the healthy leaves you just saved."
+    }
+  ],
+  "watchFor": [
+    "Spots climbing past the middle of the plant despite treatment",
+    "Dark sunken patches appearing on the fruit itself",
+    "Yellowing that starts at the leaf tips rather than as distinct spots, which points to feeding rather than blight"
+  ]
+}

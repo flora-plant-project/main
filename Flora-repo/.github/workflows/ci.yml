@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    # The live contract suite runs the mobile client against a real API and a
+    # real database. Without this the suite would only ever prove the mock
+    # agrees with itself.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: flora
+          POSTGRES_PASSWORD: flora
+          POSTGRES_DB: flora
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U flora -d flora"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://flora:flora@localhost:5432/flora
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm -F api db:generate
+      - run: pnpm -F api exec prisma migrate deploy
+      - run: pnpm test
+      # Separate from `pnpm test` because it needs the database; see
+      # apps/mobile/jest.live.config.cjs.
+      - run: pnpm -F mobile test:live

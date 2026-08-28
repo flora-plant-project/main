@@ -1,0 +1,17 @@
+{
+  "name": "@flora/workers",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "sweep": "node --env-file-if-exists=../../.env src/bin/sweep.js"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "@flora/shared": "workspace:*",
+    "api": "workspace:*"
+  }
+}
