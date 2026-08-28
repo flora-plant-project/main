@@ -1,0 +1,299 @@
+// Flora — data model.
+//
+// MIGRATION NOTE: `prisma/migrations/20260806095723_init/` contains only
+// "-- This is an empty migration." It is a retained artifact of a `migrate reset` and
+// must NOT be deleted — removing an applied migration reintroduces a history mismatch
+// that can only be cleared with another reset.
+// Design rule: buy-vs-build for the AI is invisible here. `DiagnosisResult.source`
+// is the only column that reflects where a result came from, so swapping the
+// third-party API for the team's own model changes no table and no endpoint.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------- enums
+
+enum Language {
+  AR
+  EN
+}
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum SpaceType {
+  BALCONY
+  BACKYARD
+  INDOOR
+  ROOFTOP
+}
+
+enum AddedVia {
+  NAME
+  PHOTO
+}
+
+enum ResultType {
+  IDENTIFY
+  HEALTH
+}
+
+/// MOCK is internal-only: it records that a result came from the stubbed adapter so
+/// dev data stays honest. The client-facing contract exposes THIRD_PARTY | OWN_MODEL
+/// only — the mobile app never sends or receives MOCK. The write path guards against
+/// persisting MOCK in production.
+enum RecognitionSource {
+  THIRD_PARTY
+  OWN_MODEL
+  MOCK
+}
+
+enum HealthStatus {
+  HEALTHY
+  DISEASED
+  UNKNOWN
+}
+
+/// Lifecycle of a recognition run. The mocked adapter is synchronous and always writes
+/// COMPLETE, but the column exists now so the real pipeline — S3 event triggers Lambda,
+/// which writes the result later — needs neither a migration nor a client change to
+/// represent a result that has not come back yet.
+enum DiagnosisStatus {
+  PENDING
+  COMPLETE
+  FAILED
+}
+
+enum CatalogSource {
+  THIRD_PARTY_API
+  OWN_DATASET
+  MANUAL
+}
+
+// ---------------------------------------------------------------- identity
+
+/// App-side identity. Cognito owns credentials; this row is keyed on the Cognito `sub`.
+///
+/// No account recovery by design (demo) — a forgotten password means a new account;
+/// revisit if the app goes to real users.
+model User {
+  id         String   @id @default(uuid())
+  cognitoSub String   @unique
+  username   String   @unique
+  language   Language @default(EN)
+  role       Role     @default(USER)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  spaces    Space[]
+  plants    Plant[]
+  posts     Post[]
+  comments  Comment[]
+  likes     Like[]
+  following Follow[]  @relation("Follower")
+  followers Follow[]  @relation("Following")
+
+  @@index([role])
+}
+
+// ---------------------------------------------------------------- garden
+
+model Space {
+  id        String    @id @default(uuid())
+  userId    String
+  type      SpaceType
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plants Plant[]
+
+  @@index([userId])
+}
+
+model Plant {
+  id             String   @id @default(uuid())
+  userId         String
+  spaceId        String
+  catalogEntryId String?
+  nickname       String
+  addedVia       AddedVia
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space        Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  catalogEntry CatalogEntry?     @relation(fields: [catalogEntryId], references: [id], onDelete: SetNull)
+  diagnoses    DiagnosisResult[]
+  growthLogs   GrowthLog[]
+  schedules    WateringSchedule[]
+
+  @@index([userId])
+  @@index([spaceId])
+  @@index([catalogEntryId])
+}
+
+/// Cached species taxonomy + care data. Populated from a plant-data API (AWS has no
+/// plant database) and reused across users, so we pay per species, not per lookup.
+model CatalogEntry {
+  id             String        @id @default(uuid())
+  scientificName String        @unique
+  commonNameEn   String?
+  commonNameAr   String?
+  careInfo       Json
+  source         CatalogSource @default(THIRD_PARTY_API)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  plants Plant[]
+
+  @@index([commonNameEn])
+  @@index([commonNameAr])
+}
+
+// ---------------------------------------------------------------- diagnosis
+
+/// Per-plant health history. Mirrors the recognition contract 1:1; `rawResponse`
+/// keeps the provider's original payload verbatim for later re-parsing.
+///
+/// `imageKey` stores the S3 object key, not a URL: the delivery domain (raw S3 today,
+/// CloudFront later) is presentation, and baking it into stored rows would strand every
+/// historical record the day it changes. The service resolves a URL on read.
+///
+/// The result fields are nullable because a PENDING row exists before any of them are
+/// known. `resultType` and `source` are not — both are decided when the run is requested.
+model DiagnosisResult {
+  id                   String            @id @default(uuid())
+  plantId              String
+  imageKey             String
+  resultType           ResultType
+  source               RecognitionSource
+  status               DiagnosisStatus   @default(COMPLETE)
+  speciesGuess         String?
+  healthStatus         HealthStatus?
+  disease              String?
+  confidence           Float?
+  rawResponse          Json?
+  flaggedLowConfidence Boolean           @default(false)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+
+  @@index([plantId, createdAt])
+  @@index([flaggedLowConfidence])
+  @@index([status])
+}
+
+/// Stores the S3 object key, not a URL — same reasoning as DiagnosisResult.imageKey:
+/// the delivery domain is presentation and must not be baked into historical rows.
+model GrowthLog {
+  id        String   @id @default(uuid())
+  plantId   String
+  imageKey  String
+  note      String?
+  createdAt DateTime @default(now())
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+
+  @@index([plantId, createdAt])
+}
+
+/// We own the schedule data + CRUD only. EventBridge/SNS dispatch is a teammate's concern;
+/// their poller reads `active = true AND nextDueAt <= now()`.
+///
+/// Rule: at most ONE active schedule per plant. Prisma cannot express a partial unique
+/// index, so the migration must add it by hand:
+///   CREATE UNIQUE INDEX "WateringSchedule_plantId_active_key"
+///     ON "WateringSchedule" ("plantId") WHERE "active";
+/// Inactive rows stay unconstrained, so schedule history is preserved.
+/// Seasonal reminders are out of scope; they get their own model if they prove distinct.
+model WateringSchedule {
+  id           String   @id @default(uuid())
+  plantId      String
+  intervalDays Int
+  nextDueAt    DateTime
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+
+  @@index([plantId])
+  @@index([active, nextDueAt])
+}
+
+// ---------------------------------------------------------------- community
+// The community is flat by design for now: a Post hangs directly off a User with no
+// grouping. FLOR-4 (communities by category and geographical region) is deferred to
+// Phase 10 as an additive migration — Community/Region models plus an optional
+// Post.communityId, so nothing here has to change.
+
+/// Stores the S3 object key, not a URL — same rule as DiagnosisResult and GrowthLog.
+model Post {
+  id        String   @id @default(uuid())
+  userId    String
+  body      String
+  imageKey  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments Comment[]
+  likes    Like[]
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  postId    String
+  userId    String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
+  @@index([userId])
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([userId])
+}
+
+/// Self-referential follow graph. Self-follow is blocked in the service layer —
+/// Postgres cannot express `followerId <> followingId` through Prisma.
+model Follow {
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+}

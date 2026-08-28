@@ -1,0 +1,20 @@
+# Secrets — never commit. .env.example is the committed template.
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Prisma generated client. Generated from schema.prisma by `prisma generate`, so it is
+# build output, not source. Covered by node_modules/ today; the explicit path guards
+# against a future custom `output` in the generator block.
+prisma/generated/
+
+# Logs and editor noise
+*.log
+npm-debug.log*
+.DS_Store
