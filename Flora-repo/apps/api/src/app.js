@@ -3,10 +3,11 @@ import { ErrorCode, fail, ok } from '@flora/shared';
 import { config as defaultConfig } from './config.js';
 import { prisma as defaultPrisma } from './db.js';
 import { createSessionLoader } from './middleware/auth.js';
-import { createRecognitionProvider } from './recognition/index.js';
+import { createNameSearch, createRecognitionProvider } from './recognition/index.js';
 import { createLlmProvider } from './llm/index.js';
 import { requestCareAdvice } from './llm/careAdvice.js';
 import { requestPostDraft } from './llm/postDraft.js';
+import { requestSpeciesCare } from './llm/speciesCare.js';
 import { createStorage } from './storage/index.js';
 import { createImageAttacher, createImageMapper } from './lib/media.js';
 import { createAuthRoutes } from './modules/auth/routes.js';
@@ -45,6 +46,7 @@ function defaultLlm(config) {
   return {
     advise: (result, context) => requestCareAdvice(generate, result, context),
     draft: (input) => requestPostDraft(generate, input),
+    describe: (species) => requestSpeciesCare(generate, species),
   };
 }
 
@@ -58,8 +60,10 @@ function defaultLlm(config) {
  *   config?: ReturnType<import('./config.js').loadConfig>,
  *   prisma?: import('@prisma/client').PrismaClient,
  *   recognize?: (input: object) => Promise<object>,
+ *   searchNames?: (query: string) => Promise<Array<object>>,
  *   advise?: (result: object, context: object) => Promise<object>,
  *   draft?: (input: object) => Promise<{body: string}>,
+ *   describe?: (species: object) => Promise<{profile: object, generated: boolean}>,
  *   storage?: object,
  *   store?: {insert: Function, find: Function, update: Function},
  *   logger?: Console,
@@ -69,8 +73,10 @@ export function createApp({
   config = defaultConfig,
   prisma = defaultPrisma,
   recognize = createRecognitionProvider(config),
+  searchNames = createNameSearch(config),
   advise,
   draft,
+  describe,
   storage = createStorage(config, { logger: console }),
   store,
   logger = console,
@@ -80,9 +86,10 @@ export function createApp({
   // One provider shared by both features, so the "using Bedrock / using fixture
   // stubs" line is logged once at startup rather than twice. Skipped entirely
   // when a test injects both, so no client is ever constructed there.
-  const fallback = advise && draft ? null : defaultLlm(config);
+  const fallback = advise && draft && describe ? null : defaultLlm(config);
   const resolvedAdvise = advise ?? fallback.advise;
   const resolvedDraft = draft ?? fallback.draft;
+  const resolvedDescribe = describe ?? fallback.describe;
 
   // Base64 images inflate ~33%, and the ceiling is a request-size guard, not the
   // real image check — service.create rejects oversized images with a VALIDATION
@@ -123,7 +130,17 @@ export function createApp({
 
   app.use('/auth', createAuthRoutes({ service: createAuthService({ prisma }) }));
   app.use('/me', createMeRoutes({ service: createMeService({ prisma }) }));
-  app.use('/species', createSpeciesRoutes({ service: createSpeciesService({ prisma }) }));
+  app.use(
+    '/species',
+    createSpeciesRoutes({
+      service: createSpeciesService({
+        prisma,
+        searchNames,
+        describe: resolvedDescribe,
+        logger,
+      }),
+    }),
+  );
   app.use(
     '/plants',
     createPlantsRoutes({ service: plants, schedules: createSchedulesService({ prisma }) }),

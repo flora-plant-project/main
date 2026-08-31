@@ -1,8 +1,8 @@
 import {
   MAX_INTERVAL_DAYS,
   MIN_INTERVAL_DAYS,
-  daysForDialTouch,
   dialFractionForDays,
+  parseIntervalDays,
   waterProgress,
 } from '../utils/watering.js';
 
@@ -54,32 +54,29 @@ describe('dialFractionForDays', () => {
   });
 });
 
-describe('daysForDialTouch', () => {
-  // The dial starts at twelve o'clock and sweeps clockwise, so these are the
-  // four positions a user can hit exactly.
-  it('reads the minimum at the top', () => {
-    expect(daysForDialTouch(0, -50)).toBe(MIN_INTERVAL_DAYS);
+describe('parseIntervalDays', () => {
+  it('reads a plain number of days', () => {
+    expect(parseIntervalDays('12')).toBe(12);
+    expect(parseIntervalDays('7')).toBe(7);
   });
 
-  it('reads a quarter turn clockwise as a quarter of the range', () => {
-    const span = MAX_INTERVAL_DAYS - MIN_INTERVAL_DAYS;
-    expect(daysForDialTouch(50, 0)).toBe(Math.round(span * 0.25) + MIN_INTERVAL_DAYS);
-    expect(daysForDialTouch(0, 50)).toBe(Math.round(span * 0.5) + MIN_INTERVAL_DAYS);
-    expect(daysForDialTouch(-50, 0)).toBe(Math.round(span * 0.75) + MIN_INTERVAL_DAYS);
+  it('returns null when there is no number to read', () => {
+    // The caller keeps the interval it already had rather than writing NaN.
+    expect(parseIntervalDays('')).toBeNull();
+    expect(parseIntervalDays('   ')).toBeNull();
+    expect(parseIntervalDays(null)).toBeNull();
+    expect(parseIntervalDays(undefined)).toBeNull();
   });
 
-  it('never returns a value outside the allowed range', () => {
-    for (let angle = 0; angle < 360; angle += 7) {
-      const radians = (angle * Math.PI) / 180;
-      const days = daysForDialTouch(Math.sin(radians) * 60, -Math.cos(radians) * 60);
-      expect(days).toBeGreaterThanOrEqual(MIN_INTERVAL_DAYS);
-      expect(days).toBeLessThanOrEqual(MAX_INTERVAL_DAYS);
-      expect(Number.isInteger(days)).toBe(true);
-    }
+  it('clamps rather than rejecting a number outside the range', () => {
+    expect(parseIntervalDays('0')).toBe(MIN_INTERVAL_DAYS);
+    expect(parseIntervalDays('999')).toBe(MAX_INTERVAL_DAYS);
   });
 
-  it('is unaffected by how far from the centre the touch lands', () => {
-    // Only the angle matters — dragging outwards must not change the value.
-    expect(daysForDialTouch(10, 10)).toBe(daysForDialTouch(80, 80));
+  it('reads Arabic-Indic and Persian digits', () => {
+    // An Arabic keyboard emits ٥ for five, which parseInt reads as nothing.
+    expect(parseIntervalDays('٥')).toBe(5);
+    expect(parseIntervalDays('١٤')).toBe(14);
+    expect(parseIntervalDays('۱۴')).toBe(14);
   });
 });

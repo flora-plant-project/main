@@ -115,8 +115,18 @@ model Species {
   care           Json
   /// { COASTAL: number, MOUNTAIN: number, BEKAA: number, SOUTH: number }
   zoneMultipliers Json
+  /// CATALOG = the curated seed, care data written by a person. ADOPTED = added
+  /// on demand from a scan or a search, care data written by the model. Kept
+  /// apart because they carry different authority, and because species.list()
+  /// puts the curated ten first.
+  source          SpeciesSource @default(CATALOG)
 
   plants Plant[]
+}
+
+enum SpeciesSource {
+  CATALOG
+  ADOPTED
 }
 
 // ---------------------------------------------------------------- garden

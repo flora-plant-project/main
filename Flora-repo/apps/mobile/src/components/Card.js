@@ -2,18 +2,23 @@ import { StyleSheet, View } from 'react-native';
 import { colors, radii, spacing } from '../theme.js';
 
 /**
- * Cream surface with a hairline border — the base container of the design system.
+ * White surface with a 1px #E9ECE7 border and a 16px radius — the base
+ * container of the v2 design system. Cards use borders, never shadows.
  */
-export function Card({ children, style }) {
-  return <View style={[styles.card, style]}>{children}</View>;
+export function Card({ children, style, testID }) {
+  return (
+    <View testID={testID} style={[styles.card, style]}>
+      {children}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.cream,
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
     borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: colors.hairline,
-    padding: spacing.lg,
+    padding: spacing.card,
   },
 });

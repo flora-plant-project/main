@@ -25,9 +25,8 @@
     ]
   },
   "dependencies": {
-    "@expo-google-fonts/baloo-2": "^0.4.2",
-    "@expo-google-fonts/baloo-bhaijaan-2": "^0.4.2",
-    "@expo-google-fonts/mulish": "^0.4.2",
+    "@expo-google-fonts/cairo": "^0.4.2",
+    "@expo-google-fonts/manrope": "^0.4.2",
     "@expo/vector-icons": "^15.1.1",
     "@flora/shared": "workspace:*",
     "@react-native-async-storage/async-storage": "2.2.0",

@@ -73,6 +73,7 @@ into the app bundle at build time and is readable by anyone with the app.
 | `PORT` | apps/api | Port the API listens on. Default `4000`. |
 | `PLANT_ID_API_KEY` | apps/api | Plant.id recognition key. **Secret.** Blank = fixture-backed stub recognizer (no key, no network), which is the default for everyone not working on recognition. |
 | `PLANT_ID_BASE_URL` | apps/api | Plant.id API root. Default `https://plant.id/api/v3`. |
+| — | apps/api | Two Plant.id endpoints are used under that root. `/identification` costs **1 credit** per scan. `/kb/plants/name_search`, which backs `GET /species/suggest`, is **free** — measured, not assumed — which is what makes search-as-you-type over the full species database affordable. |
 | `FLORA_RECOGNITION_TIMEOUT_MS` | apps/api | Provider call ceiling. Default `45000` — must stay under the mobile client's 90s poll budget. |
 | `FLORA_MAX_IMAGE_BYTES` | apps/api | Largest accepted image, decoded. Default `6291456`. Applies to both upload paths: the size declared to `POST /uploads`, and an inline base64 scan body. |
 | `FLORA_S3_BUCKET` | apps/api | Bucket for uploaded photos. Blank = the local-disk driver, which serves uploads from the API itself and needs no AWS account. |
@@ -85,7 +86,10 @@ into the app bundle at build time and is readable by anyone with the app.
 | `FLORA_API_HOSTING` | infra | `external` (default) issues the API an IAM user + access key into Secrets Manager. `aws` creates a task/instance role instead and no long-lived key exists. |
 | `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | apps/api | Only when hosting is `external`. **Secret.** Read them out of the Secrets Manager entry the stack creates; never commit them. On AWS, drop them entirely and let the role supply credentials. |
 | `FLORA_STUB_FIXTURE` | apps/api | Which canned response the stub replays: `healthy-basil`, `diseased-tomato` or `blurry`. |
-| `FLORA_LLM_ENABLED` | apps/api | `1` sends care advice and post drafts to Bedrock. Anything else (default) replays `test/fixtures/llm-*.json` — no AWS account, no spend. Not a secret: Bedrock authenticates off the ambient AWS credential chain, which is why this is an explicit opt-in rather than a key check. Prove a real call with `FLORA_LLM_ENABLED=1 pnpm -F api smoke:bedrock`. |
+| `FLORA_LLM_ENABLED` | apps/api | `1` sends care advice and post drafts to a real model. Anything else (default) replays `test/fixtures/llm-*.json` — no account, no spend. Which service answers is `FLORA_LLM_PROVIDER`. |
+| `FLORA_LLM_PROVIDER` | apps/api | Which model service answers when the LLM is on: `gemini` or `bedrock` (default). Bedrock is the older path and authenticates off the ambient AWS credential chain, which is why `FLORA_LLM_ENABLED` is an explicit opt-in rather than a key check. Prove a real call with `pnpm -F api smoke:gemini` or `smoke:bedrock`. |
+| `GEMINI_API_KEY` | apps/api | Gemini API key, from <https://aistudio.google.com/apikey>. **Secret.** Blank falls back to the fixture stub rather than failing to boot — an optional feature must not be able to take down scanning, watering and the feed. |
+| `FLORA_GEMINI_MODEL` | apps/api | Default `gemini-3.6-flash`. Do **not** set a `gemini-2.5-*` id: Google has closed that generation to new API keys, and a key issued today answers `404` naming `gemini-3.6-flash` as the replacement. `gemini-3.5-flash-lite` is the cheaper sibling. |
 | `FLORA_BEDROCK_REGION` | apps/api | Region for Bedrock calls. Default `us-east-1`. Model access must be requested per-region in the Bedrock console first. gpt-oss is **in-region only** — no global or geo cross-region endpoint — so this must name a region that hosts the model. |
 | `FLORA_BEDROCK_MODEL_ID` | apps/api | Default `openai.gpt-oss-120b-1:0` (OpenAI open-weight, via the Converse API on `bedrock-runtime`). `openai.gpt-oss-20b-1:0` is the smaller/cheaper sibling. |
 | `FLORA_LLM_TIMEOUT_MS` | apps/api | Ceiling on one model call. Default `30000`. |
@@ -94,7 +98,7 @@ into the app bundle at build time and is readable by anyone with the app.
 
 ### Secrets
 
-`PLANT_ID_API_KEY` is the only secret so far. Rules:
+`PLANT_ID_API_KEY` and `GEMINI_API_KEY` are the secrets. Rules:
 
 - **Never `EXPO_PUBLIC_`-prefix it.** Expo inlines those into the JS bundle at
   build time, publishing the key to every user. It belongs to `apps/api` only.
@@ -102,5 +106,10 @@ into the app bundle at build time and is readable by anyone with the app.
   gitignored `.env`. Most of the team needs no key at all — the stub covers it.
 - **Deployed environments:** store in AWS Secrets Manager / SSM Parameter Store
   and reference by ARN from the CDK stack. The value never appears in `infra/`.
-- **If it leaks:** rotate it in the Plant.id dashboard. Rewriting git history
-  does not un-share a key that has already been pushed and pulled.
+- **If one leaks:** rotate it — the Plant.id dashboard, or Google AI Studio.
+  Rewriting git history does not un-share a key that has already been pushed
+  and pulled.
+- **Plant.id is metered by a lifetime credit total**, not a monthly reset. Check
+  what is left before a demo: `curl -H "Api-Key: $PLANT_ID_API_KEY"
+  https://plant.id/api/v3/usage_info`. Blanking the key falls back to the stub
+  instantly, with no code change — which is the safety net if a demo runs dry.

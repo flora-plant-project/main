@@ -20,7 +20,18 @@ import { mockClient } from './mockClient.js';
  *   me.update({ climateZone })                     → { user }        UpdateMeSchema
  *
  *   species.list()                                 → SpeciesDto[]
- *   species.search(query)                          → SpeciesDto[]    common/scientific substring match
+ *   species.search(query)                          → SpeciesDto[]    common/scientific substring match,
+ *                                                     catalog only — every row has an id
+ *   species.suggest(query)                         → {scientificName, commonNames}[]
+ *                                                     species the catalog does NOT have, from the
+ *                                                     provider's name database (live) or a bundled
+ *                                                     list (mock). Rows carry NO id: a suggestion is
+ *                                                     not a species until it is adopted.
+ *   species.adopt({scientificName, commonNames?})  → SpeciesDto      AdoptSpeciesSchema; creates the
+ *                                                     row, care profile written by the model.
+ *                                                     Idempotent on the binomial, so a double tap
+ *                                                     and a decorated provider name both converge
+ *                                                     on one species. Needs a session.
  *   species.get(id)                                → SpeciesDto
  *
  *   plants.list()                                  → Plant[]         session user's plants

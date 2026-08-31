@@ -1,4 +1,4 @@
-import { seedSpecies } from '@flora/shared';
+import { binomial, seedSpecies } from '@flora/shared';
 
 /**
  * Scientific name -> catalog id, for resolving what the recognition provider
@@ -16,25 +16,9 @@ const SPECIES_BY_SCIENTIFIC_NAME = new Map(
   seedSpecies.map((species) => [binomial(species.scientificName), species.id]),
 );
 
-/**
- * Reduce a scientific name to its leading genus + species binomial.
- *
- * Providers append authority citations and cultivar suffixes ("Ocimum
- * basilicum L.", "Ocimum basilicum 'Genovese'"), so match on the binomial
- * rather than the full string.
- *
- * @param {unknown} scientificName
- * @returns {string}
- */
-function binomial(scientificName) {
-  return String(scientificName ?? '')
-    .toLowerCase()
-    .replace(/[^a-z\s]/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .join(' ');
-}
+// Identity lives in @flora/shared: the mobile mock de-duplicates species with
+// the same rule, and the contract suite would catch them drifting apart.
+export { binomial };
 
 /**
  * Resolve a provider-supplied scientific name to a catalog id.

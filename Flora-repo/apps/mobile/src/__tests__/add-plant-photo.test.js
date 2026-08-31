@@ -24,7 +24,16 @@ jest.mock('../api/index.js', () => ({
     auth: { me: jest.fn(), login: jest.fn(), signup: jest.fn(), logout: jest.fn() },
     me: { update: jest.fn() },
     plants: { list: jest.fn(), create: jest.fn() },
-    species: { list: jest.fn(), search: jest.fn(), get: jest.fn() },
+    species: {
+      list: jest.fn(),
+      search: jest.fn(),
+      get: jest.fn(),
+      // Defaulted here rather than per-file: the screens now search the
+      // wider species database on every keystroke, and a suite that does
+      // not care about suggestions still has to not crash on them.
+      suggest: jest.fn(async () => ({ ok: true, data: [] })),
+      adopt: jest.fn(async () => ({ ok: false, error: { code: 'INTERNAL', message: 'not stubbed' } })),
+    },
     schedules: { create: jest.fn() },
     diagnoses: { create: jest.fn(), get: jest.fn(), attach: jest.fn() },
   },

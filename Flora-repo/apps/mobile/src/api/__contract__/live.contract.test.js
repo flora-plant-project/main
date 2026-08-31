@@ -147,6 +147,22 @@ describe('liveClient', () => {
       expect(help.data.some((entry) => entry.id === post.data.id)).toBe(true);
     });
 
+    it('publishes the reviewed body instead of the canned fallback', async () => {
+      const { client, diagnosis } = await completedDiagnosis();
+
+      // The point of the ask sheet: the person reads a drafted post, edits it,
+      // and those are the words that go out under their name. The live client
+      // used to drop the argument entirely, so the canned sentence was
+      // published no matter what they had written — invisible to the mock-backed
+      // contract run, which is why this case belongs here specifically.
+      const reviewed = 'Reviewed draft — the lower leaves on my basil look pale. Ideas?';
+      const post = await client.diagnoses.escalate(diagnosis.id, { body: reviewed });
+
+      expect(post.ok).toBe(true);
+      expect(post.data.type).toBe('HELP');
+      expect(post.data.body).toBe(reviewed);
+    });
+
     it('refuses to escalate a scan that is still running', async () => {
       const client = makeClient();
       const created = await client.diagnoses.create({});

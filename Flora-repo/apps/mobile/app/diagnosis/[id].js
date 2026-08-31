@@ -9,7 +9,7 @@ import { Screen } from '../../src/components/Screen.js';
 import { Card } from '../../src/components/Card.js';
 import { Button } from '../../src/components/Button.js';
 import { Reveal } from '../../src/components/Reveal.js';
-import { colors, fonts, radii, spacing, typeScale } from '../../src/theme.js';
+import { colors, confidenceScale, fonts, radii, spacing, typeScale } from '../../src/theme.js';
 
 /** Keep polling while the job is still running, the way the scan screen does. */
 const POLL_MS = 1500;
@@ -30,7 +30,7 @@ function localName(commonNames, scientificName) {
 }
 
 /**
- * Diagnosis report.
+ * Diagnosis report — design 3d, rendered from a stored scan.
  *
  * Reached from a plant's timeline, where past diagnoses are listed. The scan
  * flow renders its own result inline in camera.js; this screen is how you get
@@ -58,13 +58,16 @@ export default function DiagnosisScreen() {
   const topIssue = issues[0] ?? null;
   const topCandidate = result?.species?.[0] ?? null;
   const isHealthy = result?.health?.isHealthy ?? true;
+  /** Confidence maps to the green→gray scale, never to red or orange. */
+  const confidenceFor = (index) => confidenceScale[Math.min(index, confidenceScale.length - 1)];
 
   const back = (
     <Button
       testID="diagnosis-back"
       label={t('diagnose.done')}
-      variant="ghost"
+      variant="secondary"
       onPress={() => router.back()}
+      style={styles.back}
     />
   );
 
@@ -80,7 +83,7 @@ export default function DiagnosisScreen() {
     return (
       <Screen edges={['top', 'bottom']}>
         <Text style={[styles.title, { fontFamily: displayFont }]}>{t('diagnosis.title')}</Text>
-        <Card style={styles.card}>
+        <Card style={styles.noticeCard}>
           <Text testID="diagnosis-error" style={styles.hint}>
             {t('diagnosis.notFound')}
           </Text>
@@ -98,7 +101,7 @@ export default function DiagnosisScreen() {
         </Text>
 
         {diagnosis.status === 'PENDING' ? (
-          <Card style={styles.card}>
+          <Card style={styles.noticeCard}>
             <ActivityIndicator color={colors.primary} />
             <Text testID="diagnosis-pending" style={styles.hint}>
               {t('diagnosis.pending')}
@@ -107,10 +110,8 @@ export default function DiagnosisScreen() {
         ) : null}
 
         {diagnosis.status === 'FAILED' ? (
-          <Card style={styles.card}>
-            <Text style={[styles.bannerTitle, { fontFamily: displayFont }]}>
-              {t('diagnose.failedTitle')}
-            </Text>
+          <Card style={styles.noticeCard}>
+            <Text style={styles.noticeTitle}>{t('diagnose.failedTitle')}</Text>
             <Text testID="diagnosis-failed" style={styles.hint}>
               {diagnosis.error?.message ?? t('diagnose.failedBody')}
             </Text>
@@ -119,22 +120,38 @@ export default function DiagnosisScreen() {
 
         {diagnosis.status === 'COMPLETE' && result ? (
           <>
-            <Card
+            <View
               testID="diagnosis-verdict"
-              style={[styles.banner, isHealthy ? styles.bannerHealthy : styles.bannerIssue]}
+              style={[styles.banner, isHealthy ? styles.bannerHealthy : styles.bannerAttention]}
             >
-              <View style={[styles.bannerBadge, isHealthy ? styles.badgeHealthy : styles.badgeIssue]}>
-                <Ionicons name={isHealthy ? 'checkmark' : 'alert'} size={18} color={colors.cream} />
+              <View
+                style={[
+                  styles.bannerBadge,
+                  isHealthy ? styles.badgeHealthy : styles.badgeAttention,
+                ]}
+              >
+                <Ionicons
+                  name={isHealthy ? 'checkmark' : 'alert'}
+                  size={17}
+                  color={colors.onPrimary}
+                />
               </View>
               <View style={styles.bannerTextWrap}>
-                <Text style={[styles.bannerTitle, { fontFamily: displayFont }]}>
+                <Text style={styles.bannerTitle}>
                   {isHealthy ? t('diagnose.healthyTitle') : t('diagnose.needsCare')}
                 </Text>
-                <Text style={styles.bannerSub}>
-                  {isHealthy ? t('diagnose.healthySub') : (topIssue?.name ?? t('diagnose.needsCare'))}
+                <Text
+                  style={[
+                    styles.bannerSub,
+                    isHealthy ? styles.bannerSubHealthy : styles.bannerSubAttention,
+                  ]}
+                >
+                  {isHealthy
+                    ? t('diagnose.healthySub')
+                    : (topIssue?.name ?? t('diagnose.needsCare'))}
                 </Text>
               </View>
-            </Card>
+            </View>
 
             {diagnosis.lowConfidence ? (
               <Text testID="diagnosis-low-confidence" style={styles.lowConfidence}>
@@ -150,19 +167,33 @@ export default function DiagnosisScreen() {
             ) : null}
 
             {issues.length > 0 ? (
-              <>
-                <Text style={styles.sectionLabel}>{t('diagnose.issues')}</Text>
-                <Card style={styles.sectionCard}>
-                  {issues.map((issue) => (
-                    <View key={issue.name} style={styles.issueRow}>
-                      <Text style={styles.issueName}>{issue.name}</Text>
-                      <Text style={styles.issuePercent}>
-                        {Math.round(issue.probability * 100)}%
-                      </Text>
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardHeaderText}>{t('diagnose.issues')}</Text>
+                </View>
+                {issues.map((issue, index) => {
+                  const percent = Math.round(issue.probability * 100);
+                  const tone = confidenceFor(index);
+                  return (
+                    <View key={issue.name} style={styles.finding}>
+                      <View style={styles.findingTop}>
+                        <Text style={styles.findingLabel}>{issue.name}</Text>
+                        <Text style={[styles.findingPercent, { color: tone.text }]}>
+                          {percent}%
+                        </Text>
+                      </View>
+                      <View style={styles.track}>
+                        <View
+                          style={[
+                            styles.trackFill,
+                            { backgroundColor: tone.fill, width: `${percent}%` },
+                          ]}
+                        />
+                      </View>
                     </View>
-                  ))}
-                </Card>
-              </>
+                  );
+                })}
+              </View>
             ) : null}
 
             {advice ? (
@@ -174,16 +205,18 @@ export default function DiagnosisScreen() {
                 </Reveal>
 
                 <Reveal delay={REVEAL_START + REVEAL_STEP}>
-                  <Text style={styles.sectionLabel}>{t('diagnosis.carePlan')}</Text>
+                  <View style={styles.cardHeaderStandalone}>
+                    <Text style={styles.cardHeaderText}>{t('diagnosis.carePlan')}</Text>
+                  </View>
                 </Reveal>
-                <Card style={styles.sectionCard}>
+                <View style={styles.card}>
                   {advice.steps.map((step, index) => (
-                    <Reveal
-                      key={step.action}
-                      delay={REVEAL_START + REVEAL_STEP * (index + 2)}
-                    >
-                      <View testID={`advice-step-${index}`} style={styles.stepRow}>
-                        <View style={styles.stepBadge}>
+                    <Reveal key={step.action} delay={REVEAL_START + REVEAL_STEP * (index + 2)}>
+                      <View
+                        testID={`advice-step-${index}`}
+                        style={[styles.step, index < advice.steps.length - 1 && styles.divided]}
+                      >
+                        <View style={styles.stepTile}>
                           <Text style={styles.stepNumber}>{index + 1}</Text>
                         </View>
                         <View style={styles.stepBody}>
@@ -194,21 +227,27 @@ export default function DiagnosisScreen() {
                       </View>
                     </Reveal>
                   ))}
-                </Card>
+                </View>
 
                 {advice.watchFor.length > 0 ? (
-                  <Reveal
-                    delay={REVEAL_START + REVEAL_STEP * (advice.steps.length + 2)}
-                  >
-                    <Text style={styles.sectionLabel}>{t('diagnosis.watchFor')}</Text>
-                    <Card style={styles.sectionCard}>
-                      {advice.watchFor.map((signal) => (
-                        <View key={signal} style={styles.watchRow}>
-                          <Ionicons name="eye-outline" size={16} color={colors.mutedText} />
-                          <Text style={styles.watchText}>{signal}</Text>
+                  <Reveal delay={REVEAL_START + REVEAL_STEP * (advice.steps.length + 2)}>
+                    <View style={styles.card}>
+                      <View style={styles.cardHeader}>
+                        <Text style={styles.cardHeaderText}>{t('diagnosis.watchFor')}</Text>
+                      </View>
+                      {advice.watchFor.map((signal, index) => (
+                        <View
+                          key={signal}
+                          style={[
+                            styles.step,
+                            index < advice.watchFor.length - 1 && styles.divided,
+                          ]}
+                        >
+                          <Ionicons name="eye-outline" size={14} color={colors.sage} />
+                          <Text style={styles.stepText}>{signal}</Text>
                         </View>
                       ))}
-                    </Card>
+                    </View>
                   </Reveal>
                 ) : null}
               </>
@@ -216,19 +255,25 @@ export default function DiagnosisScreen() {
               // No care plan: the model was skipped (low confidence) or failed.
               // The provider's own hints are the fallback, exactly as the API
               // contract promises.
-              <>
-                <Text style={styles.sectionLabel}>{t('diagnose.treatment')}</Text>
-                <Card style={styles.sectionCard}>
-                  {topIssue.treatmentHints.map((hint, index) => (
-                    <View key={hint} style={styles.stepRow}>
-                      <View style={styles.stepBadge}>
-                        <Text style={styles.stepNumber}>{index + 1}</Text>
-                      </View>
-                      <Text style={styles.stepText}>{hint}</Text>
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardHeaderText}>{t('diagnose.treatment')}</Text>
+                </View>
+                {topIssue.treatmentHints.map((hint, index) => (
+                  <View
+                    key={hint}
+                    style={[
+                      styles.step,
+                      index < topIssue.treatmentHints.length - 1 && styles.divided,
+                    ]}
+                  >
+                    <View style={styles.stepTile}>
+                      <Text style={styles.stepNumber}>{index + 1}</Text>
                     </View>
-                  ))}
-                </Card>
-              </>
+                    <Text style={styles.stepText}>{hint}</Text>
+                  </View>
+                ))}
+              </View>
             ) : null}
           </>
         ) : null}
@@ -245,60 +290,77 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.ink,
-    fontSize: typeScale.title,
+    fontSize: typeScale.display,
+    letterSpacing: -0.5,
     marginBottom: spacing.lg,
-    marginTop: spacing.xl,
+    marginTop: spacing.lg,
   },
-  card: {
+  noticeCard: {
     alignItems: 'center',
     gap: spacing.sm,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
+  },
+  noticeTitle: {
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: typeScale.heading,
+    textAlign: 'center',
   },
   hint: {
     color: colors.mutedText,
     fontFamily: fonts.body,
-    fontSize: typeScale.body,
+    fontSize: typeScale.caption,
     textAlign: 'center',
   },
   banner: {
     alignItems: 'center',
+    borderRadius: radii.lg,
     flexDirection: 'row',
     gap: spacing.md,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.card,
+    paddingVertical: 14,
+  },
+  bannerAttention: {
+    backgroundColor: colors.ink,
   },
   bannerHealthy: {
-    backgroundColor: colors.greenTint,
-  },
-  bannerIssue: {
-    backgroundColor: colors.terracottaTint,
+    backgroundColor: colors.primary,
   },
   bannerBadge: {
     alignItems: 'center',
-    borderRadius: radii.pill,
+    borderRadius: radii.badge,
     height: 32,
     justifyContent: 'center',
     width: 32,
   },
-  badgeHealthy: {
-    backgroundColor: colors.primary,
+  badgeAttention: {
+    backgroundColor: colors.badgeOnInk,
   },
-  badgeIssue: {
-    backgroundColor: colors.terracotta,
+  badgeHealthy: {
+    backgroundColor: colors.badgeOnGreen,
   },
   bannerTextWrap: {
     flex: 1,
   },
   bannerTitle: {
-    color: colors.ink,
-    fontSize: typeScale.heading,
+    color: colors.onPrimary,
+    fontFamily: fonts.display,
+    fontSize: 15.5,
   },
   bannerSub: {
-    color: colors.mutedText,
     fontFamily: fonts.body,
-    fontSize: typeScale.caption,
+    fontSize: typeScale.meta,
+    marginTop: 1,
+  },
+  bannerSubAttention: {
+    color: colors.subOnInk,
+  },
+  bannerSubHealthy: {
+    color: colors.subOnGreen,
   },
   lowConfidence: {
-    color: colors.terracotta,
+    color: colors.mutedText,
     fontFamily: fonts.bodySemi,
     fontSize: typeScale.caption,
     marginBottom: spacing.md,
@@ -306,87 +368,115 @@ const styles = StyleSheet.create({
   speciesLine: {
     color: colors.ink,
     fontFamily: fonts.bodySemi,
-    fontSize: typeScale.body,
-    marginBottom: spacing.lg,
+    fontSize: typeScale.caption,
+    marginBottom: spacing.md,
   },
   summary: {
-    color: colors.ink,
+    color: colors.inkBody,
     fontFamily: fonts.body,
-    fontSize: typeScale.body,
-    lineHeight: 22,
-    marginBottom: spacing.lg,
-  },
-  sectionLabel: {
-    color: colors.mutedText,
-    fontFamily: fonts.bodySemi,
     fontSize: typeScale.caption,
-    marginBottom: spacing.sm,
-    textTransform: 'uppercase',
+    lineHeight: 21,
+    marginBottom: spacing.md,
   },
-  sectionCard: {
-    gap: spacing.md,
-    marginBottom: spacing.lg,
+  card: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    marginBottom: spacing.md,
+    paddingBottom: spacing.sm,
+    paddingHorizontal: spacing.card,
+    paddingTop: spacing.xs,
   },
-  issueRow: {
+  cardHeader: {
+    borderBottomColor: colors.divider,
+    borderBottomWidth: 1,
+    justifyContent: 'center',
+    minHeight: 34,
+  },
+  cardHeaderStandalone: {
+    justifyContent: 'center',
+    minHeight: 34,
+  },
+  cardHeaderText: {
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: 12,
+  },
+  divided: {
+    borderBottomColor: colors.divider,
+    borderBottomWidth: 1,
+  },
+  finding: {
+    gap: 6,
+    paddingVertical: 10,
+  },
+  findingTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  issueName: {
+  findingLabel: {
     color: colors.ink,
-    fontFamily: fonts.body,
-    fontSize: typeScale.body,
-  },
-  issuePercent: {
-    color: colors.mutedText,
-    fontFamily: fonts.bodySemi,
+    fontFamily: fonts.bodyBold,
     fontSize: typeScale.caption,
   },
-  stepRow: {
+  findingPercent: {
+    fontFamily: fonts.bodyBold,
+    fontSize: typeScale.caption,
+  },
+  track: {
+    backgroundColor: colors.track,
+    borderRadius: radii.pill,
+    height: 4,
+    overflow: 'hidden',
+  },
+  trackFill: {
+    borderRadius: radii.pill,
+    height: 4,
+  },
+  step: {
+    alignItems: 'flex-start',
     flexDirection: 'row',
     gap: spacing.md,
+    paddingVertical: 10,
   },
-  stepBadge: {
+  stepTile: {
     alignItems: 'center',
-    backgroundColor: colors.greenTint,
-    borderRadius: radii.pill,
-    height: 24,
+    backgroundColor: colors.chipFill,
+    borderRadius: radii.xs,
+    height: 22,
     justifyContent: 'center',
-    width: 24,
+    width: 22,
   },
   stepNumber: {
-    color: colors.primaryDeep,
-    fontFamily: fonts.bodyBold,
+    color: colors.ink,
+    fontFamily: fonts.display,
     fontSize: typeScale.micro,
   },
   stepBody: {
     flex: 1,
-    gap: spacing.xs,
+    gap: 2,
   },
   stepText: {
-    color: colors.ink,
+    color: colors.inkBody,
     flex: 1,
     fontFamily: fonts.body,
-    fontSize: typeScale.body,
+    fontSize: typeScale.caption,
+    lineHeight: 19,
   },
   stepWhen: {
-    color: colors.primary,
-    fontFamily: fonts.bodySemi,
-    fontSize: typeScale.micro,
+    color: colors.primaryDeep,
+    fontFamily: fonts.bodyBold,
+    fontSize: typeScale.chip,
     textTransform: 'uppercase',
   },
   stepWhy: {
-    color: colors.mutedText,
+    color: colors.sage,
     fontFamily: fonts.body,
-    fontSize: typeScale.caption,
+    fontSize: typeScale.meta,
+    lineHeight: 17,
   },
-  watchRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  watchText: {
-    color: colors.mutedText,
-    flex: 1,
-    fontFamily: fonts.body,
-    fontSize: typeScale.caption,
+  back: {
+    marginTop: spacing.sm,
   },
 });

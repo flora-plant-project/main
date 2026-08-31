@@ -1,6 +1,12 @@
 export { ErrorCode, ok, fail } from './response.js';
 export { IssueCode, IssueCodes, matchIssueCode } from './issues.js';
 export {
+  binomial,
+  SUGGESTABLE_SPECIES,
+  DEFAULT_CARE_PROFILE,
+  defaultCareProfile,
+} from './species.js';
+export {
   UploadContentTypes,
   UploadExtensions,
   UPLOAD_KEY_PREFIX,
@@ -27,7 +33,11 @@ export {
   HealthAssessmentSchema,
   RecognitionResultSchema,
   CreateDiagnosisSchema,
+  EscalateDiagnosisSchema,
   CareStepSchema,
+  SpeciesSources,
+  SpeciesCareProfileSchema,
+  AdoptSpeciesSchema,
   CareAdviceSchema,
   DraftPlantContextSchema,
   DraftPostSchema,

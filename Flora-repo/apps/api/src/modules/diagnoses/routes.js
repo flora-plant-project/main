@@ -28,7 +28,7 @@ export function createDiagnosisRoutes({ service }) {
   });
 
   router.post('/:id/escalate', requireAuth, async (req, res) => {
-    send(res, await service.escalate(req.user, req.params.id), 201);
+    send(res, await service.escalate(req.user, req.params.id, req.body), 201);
   });
 
   return router;

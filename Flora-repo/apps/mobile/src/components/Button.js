@@ -1,26 +1,61 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
-import { colors, fonts, radii, spacing, typeScale } from '../theme.js';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { colors, fonts, primaryShadow, radii, spacing, typeScale } from '../theme.js';
 
 const VARIANTS = {
   primary: {
-    container: { backgroundColor: colors.primary },
-    label: { color: colors.cream },
+    container: [{ backgroundColor: colors.primary }, primaryShadow],
+    pressed: { backgroundColor: colors.primaryPressed },
+    label: { color: colors.onPrimary, fontFamily: fonts.display, fontSize: typeScale.button },
+    icon: colors.onPrimary,
+    height: 50,
   },
-  terracotta: {
-    container: { backgroundColor: colors.terracotta },
-    label: { color: colors.cream },
+  // White row button with a hairline border — the v2 "secondary" action.
+  secondary: {
+    container: { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 },
+    pressed: { backgroundColor: colors.chipFill },
+    label: { color: colors.ink, fontFamily: fonts.bodyBold, fontSize: typeScale.label },
+    icon: colors.ink,
+    height: 48,
   },
   ghost: {
-    container: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border },
-    label: { color: colors.ink },
+    container: { backgroundColor: 'transparent', borderColor: colors.border, borderWidth: 1 },
+    pressed: { backgroundColor: colors.chipFill },
+    label: { color: colors.ink, fontFamily: fonts.bodyBold, fontSize: typeScale.label },
+    icon: colors.ink,
+    height: 48,
+  },
+  // Attention in v2 is charcoal, never an accent hue.
+  dark: {
+    container: { backgroundColor: colors.ink },
+    pressed: { backgroundColor: colors.inkBody },
+    label: { color: colors.onPrimary, fontFamily: fonts.bodyBold, fontSize: typeScale.label },
+    icon: colors.onPrimary,
+    height: 48,
   },
 };
 
+/** Inline buttons sit inside rows; full-width ones take the variant's height. */
+const SMALL = { minHeight: 36, paddingHorizontal: spacing.md };
+
 /**
- * Standard button. Variants: 'primary' | 'terracotta' | 'ghost'.
+ * Standard button. Variants: 'primary' | 'secondary' | 'ghost' | 'dark'.
+ * Sizes: 'md' (48–50px, full width) | 'sm' (36px, inline).
+ * @param {{ icon?: string }} props `icon` is an Ionicons name rendered before the label.
  */
-export function Button({ label, onPress, variant = 'primary', disabled = false, style, testID }) {
+export function Button({
+  label,
+  onPress,
+  variant = 'primary',
+  size = 'md',
+  icon = null,
+  disabled = false,
+  style,
+  testID,
+}) {
   const styleSet = VARIANTS[variant] ?? VARIANTS.primary;
+  const sizing =
+    size === 'sm' ? SMALL : { minHeight: styleSet.height, paddingHorizontal: spacing.page };
   return (
     <Pressable
       testID={testID}
@@ -30,13 +65,17 @@ export function Button({ label, onPress, variant = 'primary', disabled = false, 
       onPress={onPress}
       style={({ pressed }) => [
         styles.base,
+        sizing,
         styleSet.container,
-        pressed && styles.pressed,
+        pressed && styleSet.pressed,
         disabled && styles.disabled,
         style,
       ]}
     >
-      <Text style={[styles.label, styleSet.label]}>{label}</Text>
+      <View style={styles.row}>
+        {icon ? <Ionicons name={icon} size={17} color={styleSet.icon} /> : null}
+        <Text style={[styles.label, styleSet.label]}>{label}</Text>
+      </View>
     </Pressable>
   );
 }
@@ -44,19 +83,19 @@ export function Button({ label, onPress, variant = 'primary', disabled = false, 
 const styles = StyleSheet.create({
   base: {
     alignItems: 'center',
+    borderRadius: radii.card,
     justifyContent: 'center',
-    borderRadius: radii.md,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.sm,
   },
-  pressed: {
-    opacity: 0.85,
+  row: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.45,
   },
   label: {
-    fontFamily: fonts.bodyBold,
-    fontSize: typeScale.body,
+    textAlign: 'center',
   },
 });

@@ -48,6 +48,81 @@ export function runClientContract(
       expect(blank.error.code).toBe('VALIDATION');
     });
 
+    it('suggests species the catalog does not have, and adopts one on demand', async () => {
+      const client = makeClient();
+
+      // The catalog is ten curated species; everything else in the world has to
+      // arrive this way, or the app is a list of ten plants.
+      const suggestions = await settle(client.species.suggest('pothos'));
+      expect(suggestions.ok).toBe(true);
+      expect(suggestions.data.length).toBeGreaterThan(0);
+
+      const candidate = suggestions.data[0];
+      // A suggestion is not a species yet: it has a name and nothing to point at.
+      expect(candidate.scientificName).toBeTruthy();
+      expect(candidate.id).toBeUndefined();
+
+      const adopted = await settle(client.species.adopt(candidate));
+      expect(adopted.ok).toBe(true);
+      expect(adopted.data.id).toBeTruthy();
+      expect(adopted.data.source).toBe('ADOPTED');
+      expect(adopted.data.scientificName).toBe(candidate.scientificName);
+      // Care data has to be usable immediately — it drives watering reminders.
+      expect(adopted.data.care.waterEveryDays).toBeGreaterThan(0);
+      for (const zone of ['COASTAL', 'MOUNTAIN', 'BEKAA', 'SOUTH']) {
+        expect(typeof adopted.data.zoneMultipliers[zone]).toBe('number');
+      }
+
+      // Adopted for real: findable by search, and a plant can be built on it.
+      const found = await settle(client.species.search(candidate.scientificName));
+      expect(found.data.some((species) => species.id === adopted.data.id)).toBe(true);
+
+      const planted = await settle(
+        client.plants.create({ nickname: 'Adopted one', speciesId: adopted.data.id }),
+      );
+      expect(planted.ok).toBe(true);
+    });
+
+    it('adopts idempotently — a double tap yields one species', async () => {
+      const client = makeClient();
+      const input = { scientificName: 'Epipremnum aureum', commonNames: ['Golden pothos'] };
+
+      const first = await settle(client.species.adopt(input));
+      const second = await settle(client.species.adopt(input));
+
+      expect(second.ok).toBe(true);
+      expect(second.data.id).toBe(first.data.id);
+    });
+
+    it('never re-adopts a species the catalog already curates', async () => {
+      const client = makeClient();
+      // Decorated the way a recognition provider returns it. This must find
+      // seeded basil rather than create a second one beside it.
+      const res = await settle(client.species.adopt({ scientificName: 'Ocimum basilicum L.' }));
+
+      expect(res.ok).toBe(true);
+      expect(res.data.id).toBe('sp1');
+      expect(res.data.source).toBe('CATALOG');
+    });
+
+    it('rejects a blank suggest query and an unusable adoption', async () => {
+      const client = makeClient();
+
+      const blank = await settle(client.species.suggest('   '));
+      expect(blank.error.code).toBe('VALIDATION');
+
+      const nameless = await settle(client.species.adopt({ scientificName: '' }));
+      expect(nameless.error.code).toBe('VALIDATION');
+    });
+
+    it('does not suggest a species already in the catalog', async () => {
+      const client = makeClient();
+      const res = await settle(client.species.suggest('basil'));
+
+      expect(res.ok).toBe(true);
+      expect(res.data.every((entry) => !/ocimum basilicum/i.test(entry.scientificName))).toBe(true);
+    });
+
     it('creates a plant and rejects an invalid one with VALIDATION', async () => {
       const client = makeClient();
       const created = await settle(client.plants.create({ nickname: 'Testy', speciesId: 'sp1' }));

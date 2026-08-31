@@ -4,12 +4,13 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Baloo2_600SemiBold, Baloo2_700Bold } from '@expo-google-fonts/baloo-2';
-import { Mulish_400Regular, Mulish_600SemiBold, Mulish_700Bold } from '@expo-google-fonts/mulish';
 import {
-  BalooBhaijaan2_600SemiBold,
-  BalooBhaijaan2_700Bold,
-} from '@expo-google-fonts/baloo-bhaijaan-2';
+  Manrope_500Medium,
+  Manrope_600SemiBold,
+  Manrope_700Bold,
+  Manrope_800ExtraBold,
+} from '@expo-google-fonts/manrope';
+import { Cairo_500Medium, Cairo_600SemiBold, Cairo_700Bold } from '@expo-google-fonts/cairo';
 import { setPersistentStorage } from '../src/api/storage.js';
 import { initLocale } from '../src/i18n/index.js';
 import { addWateringResponseListener, configureNotifications } from '../src/notifications/local.js';
@@ -35,13 +36,13 @@ export const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    Baloo2_600SemiBold,
-    Baloo2_700Bold,
-    Mulish_400Regular,
-    Mulish_600SemiBold,
-    Mulish_700Bold,
-    BalooBhaijaan2_600SemiBold,
-    BalooBhaijaan2_700Bold,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
+    Manrope_800ExtraBold,
+    Cairo_500Medium,
+    Cairo_600SemiBold,
+    Cairo_700Bold,
   });
   const user = useAuthStore((state) => state.user);
   const hydrated = useAuthStore((state) => state.hydrated);

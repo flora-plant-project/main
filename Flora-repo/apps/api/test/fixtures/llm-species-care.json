@@ -1,0 +1,13 @@
+{
+  "care": {
+    "waterEveryDays": 7,
+    "sun": "bright indirect light",
+    "tempC": { "min": 15, "max": 29 }
+  },
+  "zoneMultipliers": {
+    "COASTAL": 1,
+    "MOUNTAIN": 1.3,
+    "BEKAA": 0.8,
+    "SOUTH": 0.9
+  }
+}

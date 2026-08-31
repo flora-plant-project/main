@@ -4,7 +4,13 @@ import { shouldAdvise } from '../../llm/careAdvice.js';
 import { identityImage, noopAttach } from '../../lib/media.js';
 import { diagnosisView } from '../../lib/views.js';
 import { resolveSpeciesId as defaultResolveSpeciesId } from '../species/catalog.js';
-import { CreateDiagnosisSchema, IdSchema, base64ByteLength, parseWith } from './validators.js';
+import {
+  CreateDiagnosisSchema,
+  EscalateDiagnosisSchema,
+  IdSchema,
+  base64ByteLength,
+  parseWith,
+} from './validators.js';
 
 /**
  * Milliseconds from a row's createdAt, whether the store hands back a Date
@@ -286,12 +292,22 @@ export function createDiagnosisService({
      * Turn a completed diagnosis into a community HELP post — the "ask the
      * community" path from the result screen when the answer is unconvincing.
      *
+     * `input.body` is the post the person actually reviewed, normally a drafted
+     * one they edited. It is what gets published: machine- or hand-written, the
+     * words under their name are the ones they read. Without it the post falls
+     * back to plain wording built from the top issue, so escalating still works
+     * when drafting is unavailable.
+     *
      * @param {{id: string}} user
      * @param {unknown} id
+     * @param {{body?: string}} [input]
      */
-    async escalate(user, id) {
+    async escalate(user, id, input = {}) {
       const check = parseWith(IdSchema, id);
       if (check.error) return check.error;
+
+      const parsed = parseWith(EscalateDiagnosisSchema, input ?? {});
+      if (parsed.error) return parsed.error;
 
       const row = await store.find(check.data);
       if (!row) return fail(ErrorCode.NOT_FOUND, `diagnosis ${check.data} not found`);
@@ -302,11 +318,15 @@ export function createDiagnosisService({
         return fail(ErrorCode.VALIDATION, 'diagnosis is still processing — try again shortly');
       }
 
-      return posts.createHelpPost(user, {
-        imageUri: row.imageKey ?? null,
-        topIssue: row.result?.health?.issues?.[0]?.name ?? null,
-        confidence: row.result?.health?.confidence ?? null,
-      });
+      return posts.createHelpPost(
+        user,
+        {
+          imageUri: row.imageKey ?? null,
+          topIssue: row.result?.health?.issues?.[0]?.name ?? null,
+          confidence: row.result?.health?.confidence ?? null,
+        },
+        parsed.data.body,
+      );
     },
 
     /**

@@ -8,30 +8,56 @@
   },
   "garden": {
     "title": "حديقتي",
-    "greetingMorning": "صباح الخير يا {{name}}",
-    "greetingAfternoon": "نهارك سعيد يا {{name}}",
-    "greetingEvening": "مسا الخير يا {{name}}",
-    "needWater_zero": "ما في نباتات بحاجة للسقاية اليوم",
-    "needWater_one": "نبتة واحدة بحاجة للسقاية اليوم",
-    "needWater_two": "نبتتان بحاجة للسقاية اليوم",
-    "needWater_few": "{{count}} نباتات بحاجة للسقاية اليوم",
-    "needWater_many": "{{count}} نبتة بحاجة للسقاية اليوم",
-    "needWater_other": "{{count}} نبتة بحاجة للسقاية اليوم",
-    "allHappy": "كل النباتات مبسوطة اليوم",
-    "emptyTitle": "كل جنينة بتبلش بأصيص واحد",
-    "emptyBody": "ضيف أول نبتة وفلورا بتخبرك كيف تخليها مبسوطة.",
-    "emptyCta": "ضيف أول نبتة",
+    "city": "بيروت",
+    "plantCount_one": "نبتة واحدة",
+    "plantCount_two": "نبتتين",
+    "plantCount_few": "{{count}} نبتات",
+    "plantCount_many": "{{count}} نبتة",
+    "plantCount_other": "{{count}} نبتة",
+    "nothingPlanted": "ما في شي مزروع بعد",
+    "filters": {
+      "all": "الكل",
+      "balcony": "البلكون",
+      "indoors": "جوّا"
+    },
+    "today": "اليوم",
+    "tasksLeft_one": "باقي وحدة",
+    "tasksLeft_two": "باقي تنتين",
+    "tasksLeft_few": "باقي {{count}}",
+    "tasksLeft_many": "باقي {{count}}",
+    "tasksLeft_other": "باقي {{count}}",
+    "allDone": "خلصنا",
+    "taskWater": "اسقي {{name}}",
+    "now": "هلّق",
+    "dueToday": "اليوم",
+    "allPlants": "كل النبتات",
+    "addPlant": "أضف نبتة",
+    "emptyTitle": "ضيف أول نبتة",
+    "emptyBody": "صوّر نبتتك وفلورا بتعرّفا، وبتجهّز خطة سقاية لطقس بيروت.",
+    "emptyPhoto": "صوّر نبتة",
+    "emptySearch": "دوّر بالاسم",
+    "emptyPopular": "الأكثر شعبية بلبنان",
     "chip": {
-      "waterNow": "اسقيها هلق",
-      "today": "اليوم",
-      "inDays": "بعد {{count}} يوم"
+      "waterNow": "اسقيها اليوم",
+      "today": "اسقيها اليوم",
+      "inDays_one": "بعد يوم",
+      "inDays_two": "بعد يومين",
+      "inDays_few": "بعد {{count}} أيام",
+      "inDays_many": "بعد {{count}} يوم",
+      "inDays_other": "بعد {{count}} يوم",
+      "allGood": "كلّو تمام"
     }
   },
   "explore": {
     "title": "استكشف",
     "hint": "تصفح الأنواع وأدلة العناية",
     "searchPlaceholder": "دوّر على نوع — حبق، olive…",
-    "add": "+ ضيف"
+    "add": "+ ضيف",
+    "notInCatalog": "مش موجود بالقائمة بعد",
+    "addingSpecies": "عم يضيف…",
+    "moreResults": "نباتات إضافية",
+    "suggestFailed": "ما قدرنا نوصل لقاعدة بيانات النباتات",
+    "adoptFailed": "ما قدرنا نضيف هالنبتة. جرّب مرة تانية."
   },
   "community": {
     "title": "المجتمع",
@@ -115,6 +141,7 @@
     "intervalLabel": "فترة السقاية",
     "intervalUnit_one": "يوم بين السقايات",
     "intervalUnit_other": "أيام بين السقايات",
+    "intervalHint": "اضغط على الرقم لتغييره",
     "confirmWaterTitle": "سقيتها؟",
     "confirmWaterBody_one": "هيدا بيعيد الدورة — السقاية الجاي بعد يوم.",
     "confirmWaterBody_other": "هيدا بيعيد الدورة — السقاية الجاي بعد {{count}} أيام.",
@@ -168,7 +195,11 @@
     "failedTitle": "شي ذبل بالطريق",
     "failedBody": "ما قدرنا نكمل الفحص. جرب مرة تانية.",
     "retry": "جرب مرة تانية",
-    "devFixture": "DEV · {{name}}"
+    "devFixture": "DEV · {{name}}",
+    "checkedNow": "تفقّدناها هلّق",
+    "checked": "الفحص",
+    "checkedLeaves": "الورق والساق والتربة منيحين",
+    "checkedNext": "الفحص الجاي بعد أسبوعين"
   },
   "post": {
     "title": "منشور",
@@ -203,10 +234,22 @@
     "zoneTitle": "وين بتزرع؟",
     "zoneHint": "منظبط جداول السقاية حسب منطقتك المناخية.",
     "zones": {
-      "COASTAL": { "name": "الساحل", "hint": "بيروت، طرابلس، صيدا — رطب ومعتدل" },
-      "MOUNTAIN": { "name": "الجبل", "hint": "ليالي باردة وثلوج بالشتاء" },
-      "BEKAA": { "name": "البقاع", "hint": "صيف جاف وشتاء بارد" },
-      "SOUTH": { "name": "الجنوب", "hint": "دافئ ومشمس معظم السنة" }
+      "COASTAL": {
+        "name": "الساحل",
+        "hint": "بيروت، طرابلس، صيدا — رطب ومعتدل"
+      },
+      "MOUNTAIN": {
+        "name": "الجبل",
+        "hint": "ليالي باردة وثلوج بالشتاء"
+      },
+      "BEKAA": {
+        "name": "البقاع",
+        "hint": "صيف جاف وشتاء بارد"
+      },
+      "SOUTH": {
+        "name": "الجنوب",
+        "hint": "دافئ ومشمس معظم السنة"
+      }
     }
   }
 }

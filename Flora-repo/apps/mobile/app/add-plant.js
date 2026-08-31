@@ -22,6 +22,13 @@ import { Field } from '../src/components/Field.js';
 import { colors, fonts, radii, spacing, typeScale } from '../src/theme.js';
 
 const SEARCH_DEBOUNCE_MS = 300;
+
+/**
+ * Shortest query worth sending to the species database. A single-letter query
+ * measured 3.1s against Plant.id versus a ~150ms median, and matches most of
+ * the kingdom besides.
+ */
+const MIN_REMOTE_QUERY = 2;
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLLS = 45; // 45 × 2s = 90s budget for the identification service
 
@@ -32,15 +39,20 @@ export default function AddPlantScreen() {
   const queryClient = useQueryClient();
   const displayFont = i18n.language === 'ar' ? fonts.displayArabic : fonts.display;
 
-  const [tab, setTab] = useState('search');
+  const params = useLocalSearchParams();
+  const [tab, setTab] = useState(params.tab === 'photo' ? 'photo' : 'search');
   const [picked, setPicked] = useState(null); // { speciesId, commonName, scientificName }
 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState(null);
+  /** Species from the wider database that the catalog does not have yet. */
+  const [suggested, setSuggested] = useState([]);
 
   const [photoUri, setPhotoUri] = useState(null);
   const [phase, setPhase] = useState('idle'); // idle | analyzing | suggestions | timeout
   const [suggestions, setSuggestions] = useState([]);
+  /** scientificName being adopted, so only the tapped row shows a spinner. */
+  const [adopting, setAdopting] = useState(null);
   const pollTimer = useRef(null);
 
   // The scan this plant came from, from either entry point: a deep link out of
@@ -58,7 +70,6 @@ export default function AddPlantScreen() {
 
   // Deep link from the diagnose flow: /add-plant?speciesId=…&photoUri=… lands
   // straight on the confirm step with the species preselected.
-  const params = useLocalSearchParams();
   useEffect(() => {
     const speciesId =
       typeof params.speciesId === 'string' && params.speciesId ? params.speciesId : null;
@@ -82,18 +93,43 @@ export default function AddPlantScreen() {
     };
   }, [params.speciesId]);
 
-  // 300ms debounced species search
+  /**
+   * 300ms debounced species search, across BOTH sources.
+   *
+   * The catalog answers instantly and the species database a beat later; they
+   * are fired together and stored separately so the catalog rows are on screen
+   * while the rest is still in flight. `cancelled` guards the late reply of a
+   * query the user has already typed past.
+   */
   useEffect(() => {
     const trimmed = query.trim();
     if (!trimmed) {
       setResults(null);
+      setSuggested([]);
       return undefined;
     }
-    const timer = setTimeout(async () => {
-      const res = await client.species.search(trimmed);
-      if (res.ok) setResults(res.data);
+
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      client.species.search(trimmed).then((res) => {
+        if (!cancelled && res.ok) setResults(res.data);
+      });
+
+      // Too short to be worth sending — one character matches most of the
+      // kingdom and is the slowest request of the lot.
+      if (trimmed.length < MIN_REMOTE_QUERY) {
+        setSuggested([]);
+        return;
+      }
+      client.species.suggest(trimmed).then((res) => {
+        if (!cancelled) setSuggested(res.ok ? res.data : []);
+      });
     }, SEARCH_DEBOUNCE_MS);
-    return () => clearTimeout(timer);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [query]);
 
   const localName = (commonNames, scientificName) => {
@@ -105,6 +141,45 @@ export default function AddPlantScreen() {
     setPicked(species);
     setNickname(species.commonName);
     setError(null);
+  };
+
+  /**
+   * Pick a scan candidate, adopting it first when the catalog has never heard
+   * of it. Without this, anything outside the seeded ten rendered greyed out
+   * and refused the tap — which is most of what a real scan returns.
+   *
+   * @param {{speciesId?: string, scientificName: string, commonNames?: string[]}} candidate
+   */
+  const pickCandidate = async (candidate) => {
+    const commonName = localName(candidate.commonNames, candidate.scientificName);
+    if (candidate.speciesId) {
+      pick({
+        speciesId: candidate.speciesId,
+        commonName,
+        scientificName: candidate.scientificName,
+      });
+      return;
+    }
+
+    if (adopting) return;
+    setAdopting(candidate.scientificName);
+    setError(null);
+
+    const res = await client.species.adopt({
+      scientificName: candidate.scientificName,
+      commonNames: candidate.commonNames ?? [],
+    });
+    setAdopting(null);
+
+    if (!res.ok) {
+      setError(t('explore.adoptFailed'));
+      return;
+    }
+    pick({
+      speciesId: res.data.id,
+      commonName,
+      scientificName: candidate.scientificName,
+    });
   };
 
   const poll = (diagnosisId, attempts) => {
@@ -214,7 +289,7 @@ export default function AddPlantScreen() {
               </Text>
             </View>
             <View style={styles.careLine}>
-              <Ionicons name="sunny-outline" size={15} color={colors.terracotta} />
+              <Ionicons name="sunny-outline" size={15} color={colors.sage} />
               <Text style={styles.careText}>{care.sun}</Text>
             </View>
             <View style={styles.careLine}>
@@ -232,7 +307,7 @@ export default function AddPlantScreen() {
             value={autoSchedule}
             onValueChange={setAutoSchedule}
             trackColor={{ true: colors.primary, false: colors.border }}
-            thumbColor={colors.cream}
+            thumbColor={colors.surface}
           />
         </View>
         {error ? (
@@ -315,7 +390,33 @@ export default function AddPlantScreen() {
               </Card>
             </Pressable>
           ))}
-          {results && results.length === 0 ? (
+          {suggested.length > 0 ? (
+            <View testID="add-plant-suggestions">
+              <Text style={styles.suggestionsHeader}>{t('explore.moreResults')}</Text>
+              {suggested.map((candidate) => (
+                <Pressable
+                  key={candidate.scientificName}
+                  testID={`species-suggestion-${candidate.scientificName}`}
+                  accessibilityRole="button"
+                  disabled={Boolean(adopting)}
+                  onPress={() => pickCandidate(candidate)}
+                >
+                  <Card style={styles.row}>
+                    <Text style={styles.rowName}>
+                      {candidate.commonNames?.[0] ?? candidate.scientificName}
+                    </Text>
+                    <Text style={styles.rowSci}>{candidate.scientificName}</Text>
+                    {adopting === candidate.scientificName ? (
+                      <ActivityIndicator testID="species-adopting" color={colors.primary} />
+                    ) : (
+                      <Text style={styles.notInCatalog}>{t('explore.notInCatalog')}</Text>
+                    )}
+                  </Card>
+                </Pressable>
+              ))}
+            </View>
+          ) : null}
+          {results && results.length === 0 && suggested.length === 0 ? (
             <Text style={styles.noResults}>{t('addPlant.noResults', { query: query.trim() })}</Text>
           ) : null}
         </View>
@@ -349,26 +450,24 @@ export default function AddPlantScreen() {
               <Text style={styles.suggestionsTitle}>{t('addPlant.suggestionsTitle')}</Text>
               {suggestions.map((candidate, index) => (
                 <Pressable
-                  key={candidate.speciesId ?? `unknown-${index}`}
+                  key={candidate.speciesId ?? candidate.scientificName ?? `unknown-${index}`}
                   testID={`suggestion-${candidate.speciesId ?? index}`}
                   accessibilityRole="button"
-                  disabled={!candidate.speciesId}
-                  onPress={() =>
-                    pick({
-                      speciesId: candidate.speciesId,
-                      commonName: localName(candidate.commonNames, candidate.scientificName),
-                      scientificName: candidate.scientificName,
-                    })
-                  }
+                  disabled={Boolean(adopting)}
+                  onPress={() => pickCandidate(candidate)}
                 >
-                  <Card style={[styles.row, !candidate.speciesId && styles.rowDisabled]}>
+                  <Card style={styles.row}>
                     <Text style={styles.rowName}>
                       {localName(candidate.commonNames, candidate.scientificName)}
                     </Text>
                     <Text style={styles.rowSci}>{candidate.scientificName}</Text>
-                    <Text style={styles.match}>
-                      {t('addPlant.match', { percent: Math.round(candidate.probability * 100) })}
-                    </Text>
+                    {adopting === candidate.scientificName ? (
+                      <ActivityIndicator testID="suggestion-adopting" color={colors.primary} />
+                    ) : (
+                      <Text style={styles.match}>
+                        {t('addPlant.match', { percent: Math.round(candidate.probability * 100) })}
+                      </Text>
+                    )}
                   </Card>
                 </Pressable>
               ))}
@@ -407,36 +506,35 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
   },
   segment: {
-    backgroundColor: colors.greenTint,
-    borderRadius: radii.pill,
+    borderBottomColor: colors.border,
+    borderBottomWidth: 1,
     flexDirection: 'row',
+    gap: 22,
     marginBottom: spacing.lg,
-    padding: spacing.xs,
   },
   segmentBtn: {
-    alignItems: 'center',
-    borderRadius: radii.pill,
-    flex: 1,
-    paddingVertical: spacing.sm,
+    borderBottomColor: 'transparent',
+    borderBottomWidth: 2,
+    paddingBottom: 9,
   },
   segmentActive: {
-    backgroundColor: colors.primary,
+    borderBottomColor: colors.primary,
   },
   segmentLabel: {
-    color: colors.mutedText,
-    fontFamily: fonts.bodySemi,
-    fontSize: typeScale.caption,
+    color: colors.sage,
+    fontFamily: fonts.bodyBold,
+    fontSize: typeScale.filter,
   },
   segmentLabelActive: {
-    color: colors.cream,
+    color: colors.ink,
   },
   body: {
     flex: 1,
   },
   searchInput: {
-    backgroundColor: colors.cream,
+    backgroundColor: colors.surface,
     borderColor: colors.border,
-    borderRadius: radii.md,
+    borderRadius: radii.card,
     borderWidth: 1,
     color: colors.ink,
     fontFamily: fonts.body,
@@ -447,9 +545,6 @@ const styles = StyleSheet.create({
   },
   row: {
     marginBottom: spacing.sm,
-  },
-  rowDisabled: {
-    opacity: 0.5,
   },
   rowName: {
     color: colors.ink,
@@ -474,6 +569,21 @@ const styles = StyleSheet.create({
     fontSize: typeScale.body,
     marginTop: spacing.md,
     textAlign: 'center',
+  },
+  suggestionsHeader: {
+    color: colors.sage,
+    fontFamily: fonts.bodySemi,
+    fontSize: typeScale.micro,
+    letterSpacing: 0.6,
+    marginBottom: spacing.sm,
+    marginTop: spacing.lg,
+    textTransform: 'uppercase',
+  },
+  notInCatalog: {
+    color: colors.sage,
+    fontFamily: fonts.body,
+    fontSize: typeScale.micro,
+    marginTop: spacing.xs,
   },
   progress: {
     alignItems: 'center',
@@ -533,7 +643,7 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
   },
   error: {
-    color: colors.terracotta,
+    color: colors.ink,
     fontFamily: fonts.body,
     fontSize: typeScale.caption,
     marginBottom: spacing.md,

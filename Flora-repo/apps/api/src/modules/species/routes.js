@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { send } from '../../lib/respond.js';
+import { requireAuth } from '../../middleware/auth.js';
 
 /**
  * @param {{service: ReturnType<import('./service.js').createSpeciesService>}} deps
@@ -13,6 +14,17 @@ export function createSpeciesRoutes({ service }) {
   router.get('/', async (req, res) => {
     const query = req.query.q;
     send(res, query === undefined ? await service.list() : await service.search(query));
+  });
+
+  // Declared before '/:id' or Express would read "suggest" as a species id.
+  router.get('/suggest', async (req, res) => {
+    send(res, await service.suggest(req.query.q));
+  });
+
+  // Authenticated: this writes a row and, on the live path, spends a model call
+  // doing it. Anonymous callers get no say in what enters the catalog.
+  router.post('/adopt', requireAuth, async (req, res) => {
+    send(res, await service.adopt(req.body));
   });
 
   router.get('/:id', async (req, res) => {

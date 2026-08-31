@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { LlmProviderError } from './bedrock.js';
+import { LlmProviderError } from './errors.js';
 
 const FIXTURE_DIR = new URL('../../test/fixtures/', import.meta.url);
 

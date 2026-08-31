@@ -259,11 +259,60 @@ describe('diagnoses service', () => {
     const response = await service.escalate({ id: 'u1' }, id);
     expect(response.ok).toBe(true);
     // No storage in these tests, so there is no photo to carry — the post is
-    // the question and the confidence.
+    // the question and the confidence. No reviewed body was passed, so the
+    // post service gets undefined and falls back to its plain wording.
     expect(createHelpPost).toHaveBeenCalledWith(
       { id: 'u1' },
       { imageUri: null, topIssue: null, confidence: 0.31 },
+      undefined,
     );
+  });
+
+  it('publishes the reviewed body the user actually read', async () => {
+    const createHelpPost = vi.fn(async (_user, _attachment, body) => ({
+      ok: true,
+      data: { body },
+    }));
+    service = createDiagnosisService({
+      store: createDiagnosisStore(),
+      recognize: async () => uncertain,
+      posts: { createHelpPost },
+      maxImageBytes: 1024 * 1024,
+      timeoutMs: 45_000,
+      logger: { error: vi.fn() },
+    });
+
+    const { id } = (await service.create(ANON, { imageBase64: IMAGE })).data;
+    await service.settled(id);
+
+    const response = await service.escalate({ id: 'u1' }, id, {
+      body: '  Reviewed draft about my tomato.  ',
+    });
+    expect(response.ok).toBe(true);
+    // Trimmed, and carried through instead of the canned sentence.
+    expect(createHelpPost).toHaveBeenCalledWith(
+      { id: 'u1' },
+      expect.anything(),
+      'Reviewed draft about my tomato.',
+    );
+  });
+
+  it('treats a blank reviewed body as absent so the fallback still applies', async () => {
+    const createHelpPost = vi.fn(async () => ({ ok: true, data: {} }));
+    service = createDiagnosisService({
+      store: createDiagnosisStore(),
+      recognize: async () => uncertain,
+      posts: { createHelpPost },
+      maxImageBytes: 1024 * 1024,
+      timeoutMs: 45_000,
+      logger: { error: vi.fn() },
+    });
+
+    const { id } = (await service.create(ANON, { imageBase64: IMAGE })).data;
+    await service.settled(id);
+
+    expect((await service.escalate({ id: 'u1' }, id, { body: '   ' })).ok).toBe(true);
+    expect(createHelpPost).toHaveBeenCalledWith({ id: 'u1' }, expect.anything(), undefined);
   });
 });
 

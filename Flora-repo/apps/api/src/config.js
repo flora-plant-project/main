@@ -70,6 +70,23 @@ export function loadConfig(env = process.env) {
      * for reasons that have nothing to do with wanting to spend on inference.
      */
     llmEnabled: (env.FLORA_LLM_ENABLED ?? '').trim() === '1',
+    /**
+     * Which model service answers when the LLM is on: 'gemini' or 'bedrock'.
+     * Defaults to bedrock, so an existing checkout that only sets
+     * FLORA_LLM_ENABLED behaves exactly as it did before Gemini existed.
+     */
+    llmProvider: (env.FLORA_LLM_PROVIDER ?? 'bedrock').trim().toLowerCase(),
+    /**
+     * Gemini API key. A real secret, unlike the Bedrock path's ambient AWS
+     * chain — never give this an EXPO_PUBLIC_ name or it ships in the bundle.
+     */
+    geminiApiKey: (env.GEMINI_API_KEY ?? '').trim(),
+    /**
+     * Gemini model id. gemini-2.5-* is deliberately NOT the default: Google has
+     * closed that generation to new API keys, and a key issued today gets a 404
+     * naming 3.6-flash as the replacement.
+     */
+    geminiModel: (env.FLORA_GEMINI_MODEL ?? 'gemini-3.6-flash').trim(),
     bedrockRegion: (env.FLORA_BEDROCK_REGION ?? 'us-east-1').trim(),
     bedrockModelId: (env.FLORA_BEDROCK_MODEL_ID ?? 'openai.gpt-oss-120b-1:0').trim(),
     /** Ceiling on one model call. Shorter than recognition — these are small tasks. */

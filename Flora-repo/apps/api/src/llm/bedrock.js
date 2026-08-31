@@ -1,18 +1,10 @@
 import { BedrockRuntimeClient, ConverseCommand } from '@aws-sdk/client-bedrock-runtime';
 import { z } from 'zod';
+import { LlmProviderError } from './errors.js';
 
-/** Raised when the model is reachable but the call did not produce usable JSON. */
-export class LlmProviderError extends Error {
-  /**
-   * @param {string} message
-   * @param {{status?: number, cause?: unknown}} [options]
-   */
-  constructor(message, { status, cause } = {}) {
-    super(message, { cause });
-    this.name = 'LlmProviderError';
-    this.status = status;
-  }
-}
+// Re-exported so the many `from './bedrock.js'` import sites keep working now
+// that the error is shared with the Gemini provider and the stub.
+export { LlmProviderError } from './errors.js';
 
 /**
  * Turn a zod schema into the JSON Schema the model is constrained to.

@@ -5,8 +5,8 @@ import { waterStatus } from '../utils/watering.js';
 import { colors, fonts, radii, spacing, typeScale } from '../theme.js';
 
 /**
- * Watering pill per design 1a: overdue → solid terracotta "Water now",
- * due today → tinted terracotta "Today", otherwise outlined "in Nd".
+ * Plant status chip (design 3a): due today → green-tinted "Water today",
+ * otherwise a neutral gray chip counting down or reading "All good".
  */
 export function WaterChip({ nextDueAt, testID }) {
   const { t } = useTranslation();
@@ -18,7 +18,7 @@ export function WaterChip({ nextDueAt, testID }) {
       : t(`garden.chip.${status.key}`);
   return (
     <View testID={testID} style={[styles.chip, variant.chip]}>
-      <Ionicons name="water-outline" size={11} color={variant.icon} />
+      <Ionicons name={variant.icon} size={10} color={variant.iconColor} />
       <Text style={[styles.label, variant.label]}>{label}</Text>
     </View>
   );
@@ -28,32 +28,35 @@ const styles = StyleSheet.create({
   chip: {
     alignItems: 'center',
     alignSelf: 'flex-start',
-    borderRadius: radii.pill,
+    borderRadius: radii.sm,
     flexDirection: 'row',
-    gap: spacing.xs,
-    paddingHorizontal: spacing.sm + 2,
-    paddingVertical: spacing.xs,
+    gap: 5,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
   },
   label: {
     fontFamily: fonts.bodyBold,
-    fontSize: typeScale.micro,
+    fontSize: typeScale.chip,
   },
 });
 
+const NEUTRAL = {
+  chip: { backgroundColor: colors.chipFill },
+  label: { color: colors.chipText },
+  icon: 'water-outline',
+  iconColor: colors.primary,
+};
+
+const DUE = {
+  chip: { backgroundColor: colors.greenTint },
+  label: { color: colors.primaryDeep },
+  icon: 'water-outline',
+  iconColor: colors.primaryDeep,
+};
+
 const VARIANTS = {
-  waterNow: {
-    chip: { backgroundColor: colors.terracotta },
-    label: { color: colors.cream },
-    icon: colors.cream,
-  },
-  today: {
-    chip: { backgroundColor: colors.terracottaTint },
-    label: { color: colors.terracotta },
-    icon: colors.terracotta,
-  },
-  inDays: {
-    chip: { borderColor: colors.primary, borderWidth: 1 },
-    label: { color: colors.primary },
-    icon: colors.primary,
-  },
+  waterNow: DUE,
+  today: DUE,
+  inDays: NEUTRAL,
+  allGood: { ...NEUTRAL, icon: 'checkmark' },
 };

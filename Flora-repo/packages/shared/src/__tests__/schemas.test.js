@@ -11,6 +11,7 @@ import {
   SignupSchema,
   UpdateMeSchema,
 } from '../schemas.js';
+import { diagnosisFixtures } from '../seed/diagnoses.js';
 
 /**
  * Collect the dotted issue paths of a failed safeParse.
@@ -243,5 +244,26 @@ describe('DraftPostSchema', () => {
 
   it('accepts a null lastWateredAt for a never-watered plant', () => {
     expect(DraftPostSchema.safeParse({ plant: { ...plant, lastWateredAt: null } }).success).toBe(true);
+  });
+});
+
+/**
+ * The fixtures are not just mock scenery: they are seeded into the database and
+ * handed to DraftPostSchema by both clients when someone asks the community for
+ * help. A fixture that does not satisfy RecognitionResultSchema fails drafting
+ * at runtime and nowhere else, which is exactly how a missing issue `code` got
+ * shipped — so validate them here.
+ */
+describe('diagnosisFixtures', () => {
+  it.each(Object.keys(diagnosisFixtures))('%s is a valid RecognitionResult', (name) => {
+    const result = RecognitionResultSchema.safeParse(diagnosisFixtures[name]);
+    expect(result.error?.issues ?? []).toEqual([]);
+    expect(result.success).toBe(true);
+  });
+
+  it.each(Object.keys(diagnosisFixtures))('%s is draftable as a community post', (name) => {
+    const result = DraftPostSchema.safeParse({ diagnosis: diagnosisFixtures[name] });
+    expect(result.error?.issues ?? []).toEqual([]);
+    expect(result.success).toBe(true);
   });
 });

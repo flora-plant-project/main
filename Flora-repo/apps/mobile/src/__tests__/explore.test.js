@@ -38,7 +38,16 @@ jest.mock('../api/index.js', () => ({
       timeline: jest.fn(),
       logs: { create: jest.fn() },
     },
-    species: { list: jest.fn(), search: jest.fn(), get: jest.fn() },
+    species: {
+      list: jest.fn(),
+      search: jest.fn(),
+      get: jest.fn(),
+      // Defaulted here rather than per-file: the screens now search the
+      // wider species database on every keystroke, and a suite that does
+      // not care about suggestions still has to not crash on them.
+      suggest: jest.fn(async () => ({ ok: true, data: [] })),
+      adopt: jest.fn(async () => ({ ok: false, error: { code: 'INTERNAL', message: 'not stubbed' } })),
+    },
     schedules: { create: jest.fn() },
     diagnoses: { create: jest.fn(), get: jest.fn(), attach: jest.fn(), escalate: jest.fn() },
     feed: { list: jest.fn() },
@@ -82,7 +91,9 @@ it('browses the catalog, searches with a debounce, and adds a species', async ()
   expect(client.species.search).toHaveBeenCalledWith('bas');
   await waitFor(() => expect(screen.queryByText('Tomato')).toBeNull());
 
-  await fireEvent.press(screen.getByTestId('explore-add-sp1'));
+  // Awaited rather than fetched synchronously: search results arrive through
+  // react-query now, so the row renders a tick after the call is observed.
+  await fireEvent.press(await screen.findByTestId('explore-add-sp1'));
   // lands on the add-plant confirm step with the species preselected
   await waitFor(() => expect(app.getPathnameWithParams()).toBe('/add-plant?speciesId=sp1'));
   expect(await screen.findByTestId('confirm-nickname')).toBeTruthy();

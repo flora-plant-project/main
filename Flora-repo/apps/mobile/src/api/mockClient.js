@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  AdoptSpeciesSchema,
   CreatePlantSchema,
   CreatePostSchema,
   CreateScheduleSchema,
@@ -7,7 +8,10 @@ import {
   ErrorCode,
   RegisterDeviceSchema,
   SignupSchema,
+  SUGGESTABLE_SPECIES,
   UpdateMeSchema,
+  binomial,
+  defaultCareProfile,
   diagnosisFixtures,
   fail,
   fixtureNames,
@@ -316,6 +320,71 @@ export function createMockClient({ storage } = {}) {
               ),
             ),
           );
+        });
+      },
+      /**
+       * Species not in the catalog yet.
+       *
+       * The live client asks Plant.id; offline there is a short bundled list,
+       * because the mock has to keep working in airplane mode and a path that
+       * silently returns nothing would look identical to a broken one. Rows
+       * carry no id — nothing is real until it is adopted.
+       */
+      suggest(query) {
+        return call(() => {
+          const { data, error } = parseWith(SpeciesQuerySchema, query);
+          if (error) return error;
+
+          const q = data.toLowerCase();
+          const known = new Set(store.species.map((entry) => binomial(entry.scientificName)));
+
+          return ok(
+            clone(
+              SUGGESTABLE_SPECIES.filter(
+                (entry) =>
+                  !known.has(binomial(entry.scientificName)) &&
+                  (entry.scientificName.toLowerCase().includes(q) ||
+                    entry.commonNames.some((name) => name.toLowerCase().includes(q))),
+              ),
+            ),
+          );
+        });
+      },
+      /**
+       * Add a species to the catalog so a plant can point at it.
+       *
+       * Idempotent on the binomial, matching the API: two taps produce one
+       * species. The care profile is the neutral default rather than anything
+       * model-written — offline there is no model, and the honest answer to
+       * "how often does this want water" is the generic weekly one.
+       */
+      adopt(input) {
+        return call(() => {
+          const user = currentUser();
+          if (!user) return notLoggedIn();
+
+          const { data, error } = parseWith(AdoptSpeciesSchema, input);
+          if (error) return error;
+
+          const key = binomial(data.scientificName);
+          if (!key) return fail(ErrorCode.VALIDATION, 'scientificName must name a genus and species');
+
+          const existing = store.species.find(
+            (entry) => binomial(entry.scientificName) === key,
+          );
+          if (existing) return ok(clone(existing));
+
+          const species = {
+            id: makeId('sp'),
+            scientificName: data.scientificName,
+            commonNames: data.commonNames,
+            ...defaultCareProfile(),
+            source: 'ADOPTED',
+            sortOrder: 1000,
+          };
+          store.species.push(species);
+          schedulePersist();
+          return ok(clone(species));
         });
       },
       /** One species by id. */

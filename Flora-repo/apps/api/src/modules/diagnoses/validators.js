@@ -1,9 +1,9 @@
-import { CreateDiagnosisSchema } from '@flora/shared';
+import { CreateDiagnosisSchema, EscalateDiagnosisSchema } from '@flora/shared';
 import { IdSchema, parseWith } from '../../lib/validate.js';
 
 // Re-exported so this module's own files import one thing. The implementations
 // are shared with every other module — see src/lib/validate.js.
-export { CreateDiagnosisSchema, IdSchema, parseWith };
+export { CreateDiagnosisSchema, EscalateDiagnosisSchema, IdSchema, parseWith };
 
 /**
  * Decoded byte length of a base64 string, without allocating a Buffer for it.

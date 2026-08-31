@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xxl,
   },
   formError: {
-    color: colors.terracotta,
+    color: colors.ink,
     fontFamily: fonts.body,
     fontSize: typeScale.caption,
     marginBottom: spacing.md,

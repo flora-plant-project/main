@@ -1,3 +1,5 @@
+import { IssueCode } from '../issues.js';
+
 /**
  * Canned RecognitionResult-shaped fixtures for the mock diagnosis flow.
  * Select the next one with mockClient.setNextDiagnosisFixture(name); default is random.
@@ -45,6 +47,7 @@ export const diagnosisFixtures = {
       isHealthy: false,
       issues: [
         {
+          code: IssueCode.EARLY_BLIGHT,
           name: 'Early blight',
           probability: 0.81,
           treatmentHints: [
@@ -54,6 +57,7 @@ export const diagnosisFixtures = {
           ],
         },
         {
+          code: IssueCode.NUTRIENT_DEFICIENCY,
           name: 'Nitrogen deficiency',
           probability: 0.22,
           treatmentHints: ['Feed with a balanced fertilizer every two weeks'],

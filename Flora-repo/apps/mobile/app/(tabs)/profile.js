@@ -61,7 +61,7 @@ export default function ProfileScreen() {
       {canResetDemo ? (
         <Button
           testID="dev-demo-reset"
-          variant="terracotta"
+          variant="dark"
           label={t('profile.devReset')}
           onPress={resetDemo}
           style={styles.remindersButton}
@@ -75,12 +75,13 @@ const styles = StyleSheet.create({
   title: {
     color: colors.ink,
     fontSize: typeScale.display,
+    letterSpacing: -0.5,
     marginBottom: spacing.lg,
   },
   sectionLabel: {
     color: colors.ink,
-    fontFamily: fonts.bodyBold,
-    fontSize: typeScale.heading,
+    fontFamily: fonts.display,
+    fontSize: typeScale.caption,
     marginBottom: spacing.md,
   },
   row: {

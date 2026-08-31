@@ -43,7 +43,16 @@ jest.mock('../api/index.js', () => ({
       timeline: jest.fn(),
       logs: { create: jest.fn() },
     },
-    species: { list: jest.fn(), search: jest.fn(), get: jest.fn() },
+    species: {
+      list: jest.fn(),
+      search: jest.fn(),
+      get: jest.fn(),
+      // Defaulted here rather than per-file: the screens now search the
+      // wider species database on every keystroke, and a suite that does
+      // not care about suggestions still has to not crash on them.
+      suggest: jest.fn(async () => ({ ok: true, data: [] })),
+      adopt: jest.fn(async () => ({ ok: false, error: { code: 'INTERNAL', message: 'not stubbed' } })),
+    },
     schedules: { create: jest.fn() },
     diagnoses: { create: jest.fn(), get: jest.fn() },
   },
@@ -71,7 +80,7 @@ beforeEach(() => {
 
 it('updates the chip optimistically and rolls back when markWatered fails', async () => {
   await renderRouter('./app', { initialUrl: '/plant/p1' });
-  expect(await screen.findByText('Water now')).toBeTruthy();
+  expect(await screen.findByText('Water today')).toBeTruthy();
   // wait for the species query so the optimistic update uses the real 2-day interval
   expect((await screen.findAllByText('Every 2 days')).length).toBeGreaterThan(0);
 
@@ -79,12 +88,12 @@ it('updates the chip optimistically and rolls back when markWatered fails', asyn
   await fireEvent.press(screen.getByTestId('mark-watered'));
   await fireEvent.press(await screen.findByTestId('confirm-water'));
   // optimistic: basil at COASTAL waters every 2 days
-  expect(await screen.findByText('in 2d')).toBeTruthy();
-  expect(screen.queryByText('Water now')).toBeNull();
+  expect(await screen.findByText('In 2 days')).toBeTruthy();
+  expect(screen.queryByText('Water today')).toBeNull();
 
   await act(async () => {
     await jest.advanceTimersByTimeAsync(5100);
   });
-  expect(await screen.findByText('Water now')).toBeTruthy();
-  expect(screen.queryByText('in 2d')).toBeNull();
+  expect(await screen.findByText('Water today')).toBeTruthy();
+  expect(screen.queryByText('In 2 days')).toBeNull();
 });

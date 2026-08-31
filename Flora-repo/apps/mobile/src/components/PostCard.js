@@ -40,7 +40,7 @@ export function PostCard({ post, onPress, onPressAuthor, onToggleLike }) {
 
         {post.status === 'PENDING_REVIEW' ? (
           <View testID={`pending-${post.id}`} style={styles.pending}>
-            <Ionicons name="eye-off-outline" size={13} color={colors.terracotta} />
+            <Ionicons name="eye-off-outline" size={13} color={colors.ink} />
             <Text style={styles.pendingText}>{t('community.pendingBadge')}</Text>
           </View>
         ) : null}
@@ -97,7 +97,7 @@ export function PostCard({ post, onPress, onPressAuthor, onToggleLike }) {
             <Ionicons
               name={post.likedByMe ? 'heart' : 'heart-outline'}
               size={18}
-              color={post.likedByMe ? colors.terracotta : colors.mutedText}
+              color={post.likedByMe ? colors.primary : colors.sage}
             />
             <Text testID={`like-count-${post.id}`} style={styles.footerText}>
               {post.likeCount}
@@ -125,17 +125,17 @@ const styles = StyleSheet.create({
   },
   author: {
     color: colors.ink,
-    fontFamily: fonts.bodyBold,
+    fontFamily: fonts.display,
     fontSize: typeScale.body,
   },
   time: {
     color: colors.sage,
     fontFamily: fonts.body,
-    fontSize: typeScale.caption,
+    fontSize: typeScale.meta,
   },
   pending: {
     alignItems: 'center',
-    backgroundColor: colors.terracottaTint,
+    backgroundColor: colors.chipFill,
     borderRadius: radii.sm,
     flexDirection: 'row',
     gap: spacing.xs,
@@ -143,13 +143,13 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   pendingText: {
-    color: colors.terracotta,
+    color: colors.ink,
     fontFamily: fonts.bodySemi,
     fontSize: typeScale.micro,
   },
   helpCard: {
-    backgroundColor: colors.terracottaTint,
-    borderRadius: radii.md,
+    backgroundColor: colors.chipFill,
+    borderRadius: radii.card,
     flexDirection: 'row',
     gap: spacing.md,
     padding: spacing.sm,
@@ -169,25 +169,25 @@ const styles = StyleSheet.create({
     fontSize: typeScale.caption,
   },
   confTrack: {
-    backgroundColor: colors.cream,
+    backgroundColor: colors.track,
     borderRadius: radii.pill,
     height: 4,
     marginTop: spacing.xs,
     overflow: 'hidden',
   },
   confFill: {
-    backgroundColor: colors.terracotta,
+    backgroundColor: colors.primaryDeep,
     borderRadius: radii.pill,
     height: 4,
   },
   confLabel: {
-    color: colors.terracotta,
+    color: colors.primaryDeep,
     fontFamily: fonts.bodySemi,
     fontSize: typeScale.micro,
     marginTop: 2,
   },
   body: {
-    color: colors.ink,
+    color: colors.inkBody,
     fontFamily: fonts.body,
     fontSize: typeScale.body,
     lineHeight: 21,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   carouselImage: {
-    borderRadius: radii.md,
+    borderRadius: radii.card,
     height: 160,
     marginRight: spacing.sm,
     width: 240,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   footerText: {
-    color: colors.mutedText,
+    color: colors.sage,
     fontFamily: fonts.bodySemi,
     fontSize: typeScale.caption,
   },

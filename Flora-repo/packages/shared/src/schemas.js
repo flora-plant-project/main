@@ -36,6 +36,23 @@ export const CreatePostSchema = z
     path: ['body'],
   });
 
+/**
+ * Payload for POST /diagnoses/:id/escalate.
+ *
+ * `body` is the reviewed post text — normally a drafted post the person has
+ * read and edited. It is optional because escalating must keep working when
+ * drafting is unavailable; the service falls back to plain wording built from
+ * the top issue. Empty or whitespace-only text is treated as absent rather than
+ * rejected, so a cleared editor lands on the fallback instead of erroring.
+ */
+export const EscalateDiagnosisSchema = z.object({
+  body: z
+    .string()
+    .trim()
+    .transform((text) => text || undefined)
+    .optional(),
+});
+
 /** Payload for POST /devices — registers a push-notification token. */
 export const RegisterDeviceSchema = z.object({
   pushToken: z.string().min(1),
@@ -220,4 +237,60 @@ export const DraftPostSchema = z
  */
 export const PostDraftSchema = z.object({
   body: z.string().min(1),
+});
+
+/**
+ * How a species got into the catalog.
+ *
+ * CATALOG is the curated seed — ten species with care data written by hand.
+ * ADOPTED is one the app added on demand, because a scan or a search turned up
+ * a plant nobody had curated yet. The distinction is kept because the two carry
+ * different authority: curated care data was checked by a person, adopted care
+ * data was written by a model and should be presented as a starting point.
+ */
+export const SpeciesSources = Object.freeze(['CATALOG', 'ADOPTED']);
+
+/**
+ * A species' care profile — the part that differs per plant and per zone.
+ *
+ * This is also the schema the model is constrained to when adopting a species,
+ * which is why the bounds are tight: `waterEveryDays` of 400 or a multiplier of
+ * 12 is not a care plan, it is a hallucination, and it would go on to drive
+ * real watering reminders.
+ */
+export const SpeciesCareProfileSchema = z.object({
+  care: z.object({
+    /** Base interval before the zone multiplier. Two weeks is already extreme. */
+    waterEveryDays: z.number().int().min(1).max(30),
+    sun: z.string().min(1).max(40),
+    tempC: z.object({
+      min: z.number().int().min(-20).max(40),
+      max: z.number().int().min(-10).max(60),
+    }),
+  }),
+  /**
+   * Per-zone scaling of the base interval. Cool mountain air stretches it (>1),
+   * the hot dry Bekaa shortens it (<1). Bounded either side of 1 so a bad
+   * generation cannot turn a 3-day plant into a monthly one.
+   */
+  zoneMultipliers: z.object({
+    COASTAL: z.number().min(0.5).max(2),
+    MOUNTAIN: z.number().min(0.5).max(2),
+    BEKAA: z.number().min(0.5).max(2),
+    SOUTH: z.number().min(0.5).max(2),
+  }),
+});
+
+/**
+ * Payload for POST /species/adopt — take a species the catalog does not have
+ * yet and give it a row, so a plant can point at it.
+ *
+ * `scientificName` is the identity and the only required field: it is what the
+ * recognition provider returns, what the name search returns, and what the
+ * server de-duplicates on. Common names ride along when the caller has them so
+ * the row reads properly in both languages without a second lookup.
+ */
+export const AdoptSpeciesSchema = z.object({
+  scientificName: z.string().trim().min(1).max(120),
+  commonNames: z.array(z.string().trim().min(1).max(80)).max(6).default([]),
 });

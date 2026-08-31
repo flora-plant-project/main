@@ -24,12 +24,14 @@ import { Button } from '../src/components/Button.js';
 import { Field } from '../src/components/Field.js';
 import { Reveal } from '../src/components/Reveal.js';
 import { useAuthStore } from '../src/store/authStore.js';
-import { colors, fonts, radii, spacing, typeScale } from '../src/theme.js';
+import { colors, confidenceScale, fonts, radii, spacing, typeScale } from '../src/theme.js';
 
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLLS = 45; // 90s budget
 const PROGRESS_ROTATE_MS = 2500;
 const FIXTURES = ['healthy-basil', 'diseased-tomato', 'blurry'];
+/** Overlapping community avatars on the "Ask the community" row (design 3d). */
+const AVATAR_TINTS = [colors.greenTint, colors.greenTintBorder, colors.greenLight];
 
 /** Camera modal: capture or pick → diagnose/identify → result card (design 1d). */
 export default function CameraModal() {
@@ -56,6 +58,9 @@ export default function CameraModal() {
   const [drafting, setDrafting] = useState(false);
   const [asking, setAsking] = useState(false);
   const [fixtureIndex, setFixtureIndex] = useState(0);
+  /** scientificName being adopted, so only the tapped suggestion shows a spinner. */
+  const [adopting, setAdopting] = useState(null);
+  const [adoptError, setAdoptError] = useState(false);
   const cameraRef = useRef(null);
   const pollTimer = useRef(null);
 
@@ -174,6 +179,47 @@ export default function CameraModal() {
   const waterDays = waterSpeciesQuery.data
     ? zoneAdjustedInterval(waterSpeciesQuery.data, user?.climateZone)
     : null;
+
+  /**
+   * Open the add-plant flow for a scan candidate.
+   *
+   * A candidate the catalog already knows carries `speciesId` and goes straight
+   * through. One it does not know used to be rendered greyed out and untappable,
+   * which made the whole suggestion list look broken the moment someone scanned
+   * anything outside the seeded ten. Now it is adopted first — the species gets
+   * a row and a care profile — and then the flow continues identically.
+   *
+   * @param {{speciesId?: string, scientificName: string, commonNames?: string[]}} candidate
+   */
+  const chooseCandidate = async (candidate) => {
+    if (adopting) return;
+
+    let speciesId = candidate.speciesId;
+    if (!speciesId) {
+      setAdopting(candidate.scientificName);
+      setAdoptError(false);
+
+      const res = await client.species.adopt({
+        scientificName: candidate.scientificName,
+        commonNames: candidate.commonNames ?? [],
+      });
+      setAdopting(null);
+
+      if (!res.ok) {
+        setAdoptError(true);
+        return;
+      }
+      speciesId = res.data.id;
+      // A new species exists; anything listing the catalog is now stale.
+      queryClient.invalidateQueries({ queryKey: ['species'] });
+    }
+
+    router.push(
+      `/add-plant?speciesId=${speciesId}` +
+        `&photoUri=${encodeURIComponent(imageUri ?? '')}` +
+        (diagnosis?.id ? `&diagnosisId=${diagnosis.id}` : ''),
+    );
+  };
 
   const attach = async (targetPlantId) => {
     const res = await client.diagnoses.attach(diagnosis.id, targetPlantId);
@@ -298,7 +344,7 @@ export default function CameraModal() {
             onPress={pickFromGallery}
             style={styles.controlBtn}
           >
-            <Ionicons name="images-outline" size={24} color={colors.cream} />
+            <Ionicons name="images-outline" size={24} color={colors.surface} />
           </Pressable>
           <Pressable
             testID="diagnose-capture"
@@ -316,7 +362,7 @@ export default function CameraModal() {
             onPress={() => router.back()}
             style={styles.controlBtn}
           >
-            <Ionicons name="chevron-down" size={26} color={colors.cream} />
+            <Ionicons name="chevron-down" size={26} color={colors.surface} />
           </Pressable>
         </View>
       </View>
@@ -360,150 +406,231 @@ export default function CameraModal() {
             onPress={() => analyze(imageUri, imageBase64)}
             style={styles.failedRetry}
           />
-          <Button variant="ghost" label={t('diagnose.done')} onPress={() => router.back()} />
+          <Button variant="ghost" label={t('diagnose.done')} onPress={finish} />
         </View>
       </Screen>
     );
   }
 
-  // result
+  // result — design 3d: photo header, sheet, verdict, findings, treatment
+  const headerTitle = topCandidate
+    ? localName(topCandidate.commonNames, topCandidate.scientificName)
+    : t('diagnosis.title');
+  const headerMeta = [topCandidate?.scientificName, t('diagnose.checkedNow')]
+    .filter(Boolean)
+    .join(' · ');
+  const confidenceFor = (index) => confidenceScale[Math.min(index, confidenceScale.length - 1)];
+
   return (
-    <Screen edges={['top', 'bottom']} style={styles.resultScreen}>
-      <ScrollView contentContainerStyle={styles.resultContent}>
-        <View style={styles.heroWrap}>
-          <Image source={{ uri: imageUri }} style={styles.heroPhoto} contentFit="cover" />
-          {topCandidate ? (
-            <View style={styles.heroPill}>
-              <Text style={styles.heroPillText}>
-                {localName(topCandidate.commonNames, topCandidate.scientificName)}
-              </Text>
-            </View>
-          ) : null}
+    <View style={styles.resultScreen}>
+      <ScrollView contentContainerStyle={styles.resultContent} bounces={false}>
+        <View style={styles.photoHeader}>
+          <Image source={{ uri: imageUri }} style={styles.photoHeaderImage} contentFit="cover" />
+          <Pressable
+            testID="diagnose-back"
+            accessibilityRole="button"
+            accessibilityLabel={t('camera.close')}
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <Ionicons name="chevron-back" size={17} color={colors.ink} />
+          </Pressable>
         </View>
 
-        <Card
-          testID="verdict-banner"
-          style={[styles.banner, isHealthy ? styles.bannerHealthy : styles.bannerIssue]}
-        >
-          <View style={[styles.bannerBadge, isHealthy ? styles.badgeHealthy : styles.badgeIssue]}>
-            <Ionicons name={isHealthy ? 'checkmark' : 'alert'} size={18} color={colors.cream} />
-          </View>
-          <View style={styles.bannerTextWrap}>
-            <Text style={[styles.bannerTitle, { fontFamily: displayFont }]}>
-              {isHealthy ? t('diagnose.healthyTitle') : t('diagnose.needsCare')}
+        <View style={styles.sheet}>
+          <View style={styles.titleRow}>
+            <Text style={[styles.plantName, { fontFamily: displayFont }]} numberOfLines={1}>
+              {headerTitle}
             </Text>
-            <Text style={styles.bannerSub}>
-              {isHealthy ? t('diagnose.healthySub') : (topIssue?.name ?? t('diagnose.needsCare'))}
+            <Text style={styles.plantMeta} numberOfLines={1}>
+              {headerMeta}
             </Text>
           </View>
-        </Card>
 
-        {diagnosis?.lowConfidence ? (
-          <Text testID="low-confidence-note" style={styles.lowConfidence}>
-            {t('diagnose.lowConfidenceNote')}
-          </Text>
-        ) : null}
-
-        {mode === 'identify' && candidates.length > 0 ? (
-          <>
-            <Text style={styles.sectionLabel}>{t('diagnose.suggestions')}</Text>
-            {candidates.map((candidate, index) => (
-              <Pressable
-                key={candidate.speciesId ?? `unknown-${index}`}
-                testID={`diagnose-suggestion-${candidate.speciesId ?? index}`}
-                accessibilityRole="button"
-                disabled={!candidate.speciesId}
-                onPress={() => {
-                  router.push(
-                    `/add-plant?speciesId=${candidate.speciesId}` +
-                      `&photoUri=${encodeURIComponent(imageUri ?? '')}` +
-                      (diagnosis?.id ? `&diagnosisId=${diagnosis.id}` : ''),
-                  );
-                }}
+          <View
+            testID="verdict-banner"
+            style={[styles.banner, isHealthy ? styles.bannerHealthy : styles.bannerAttention]}
+          >
+            <View
+              style={[styles.bannerBadge, isHealthy ? styles.badgeHealthy : styles.badgeAttention]}
+            >
+              <Ionicons
+                name={isHealthy ? 'checkmark' : 'alert'}
+                size={17}
+                color={colors.onPrimary}
+              />
+            </View>
+            <View style={styles.bannerTextWrap}>
+              <Text style={styles.bannerTitle}>
+                {isHealthy ? t('diagnose.healthyTitle') : t('diagnose.needsCare')}
+              </Text>
+              <Text
+                style={[
+                  styles.bannerSub,
+                  isHealthy ? styles.bannerSubHealthy : styles.bannerSubAttention,
+                ]}
               >
-                <Card style={[styles.rowCard, !candidate.speciesId && styles.rowDisabled]}>
-                  <Text style={styles.rowName}>
-                    {localName(candidate.commonNames, candidate.scientificName)}
-                  </Text>
-                  <Text style={styles.rowSci}>
-                    {candidate.scientificName} ·{' '}
-                    {t('addPlant.match', { percent: Math.round(candidate.probability * 100) })}
-                  </Text>
-                </Card>
-              </Pressable>
-            ))}
-          </>
-        ) : topCandidate ? (
-          <Text style={styles.speciesLine}>
-            {localName(topCandidate.commonNames, topCandidate.scientificName)} ·{' '}
-            {topCandidate.scientificName}
-          </Text>
-        ) : null}
+                {isHealthy ? t('diagnose.healthySub') : (topIssue?.name ?? t('diagnose.needsCare'))}
+              </Text>
+            </View>
+          </View>
 
-        {issues.length > 0 ? (
-          <>
-            <Text style={styles.sectionLabel}>{t('diagnose.issues')}</Text>
-            <Card style={styles.sectionCard}>
-              {issues.map((issue, index) => (
-                <View key={issue.name} style={styles.issueRow}>
-                  <View style={styles.issueTop}>
-                    <Text style={styles.issueName}>{issue.name}</Text>
-                    <Text style={styles.issuePercent}>{Math.round(issue.probability * 100)}%</Text>
+          {diagnosis?.lowConfidence ? (
+            <Text testID="low-confidence-note" style={styles.lowConfidence}>
+              {t('diagnose.lowConfidenceNote')}
+            </Text>
+          ) : null}
+
+          {mode === 'identify' && candidates.length > 0 ? (
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardHeaderText}>{t('diagnose.suggestions')}</Text>
+              </View>
+              {candidates.map((candidate, index) => (
+                <Pressable
+                  key={candidate.speciesId ?? candidate.scientificName ?? `unknown-${index}`}
+                  testID={`diagnose-suggestion-${candidate.speciesId ?? index}`}
+                  accessibilityRole="button"
+                  // Every candidate is selectable now. One outside the catalog
+                  // is adopted on the way through rather than being a dead row.
+                  disabled={Boolean(adopting)}
+                  onPress={() => chooseCandidate(candidate)}
+                  style={[
+                    styles.suggestion,
+                    index < candidates.length - 1 && styles.divided,
+                  ]}
+                >
+                  <View style={styles.suggestionText}>
+                    <Text style={styles.rowName}>
+                      {localName(candidate.commonNames, candidate.scientificName)}
+                    </Text>
+                    <Text style={styles.rowSci}>{candidate.scientificName}</Text>
                   </View>
-                  <View style={styles.barTrack}>
-                    <View
-                      testID={`issue-bar-${index}`}
-                      style={[styles.barFill, { width: `${Math.round(issue.probability * 100)}%` }]}
-                    />
-                  </View>
-                </View>
+                  {adopting === candidate.scientificName ? (
+                    <ActivityIndicator testID="diagnose-adopting" color={colors.primary} />
+                  ) : (
+                    <Text style={styles.rowMatch}>
+                      {t('addPlant.match', { percent: Math.round(candidate.probability * 100) })}
+                    </Text>
+                  )}
+                </Pressable>
               ))}
-            </Card>
-          </>
-        ) : null}
+              {adoptError ? (
+                <Text testID="diagnose-adopt-error" style={styles.adoptError}>
+                  {t('explore.adoptFailed')}
+                </Text>
+              ) : null}
+            </View>
+          ) : null}
 
-        {topIssue?.treatmentHints?.length ? (
-          <>
-            <Text style={styles.sectionLabel}>{t('diagnose.treatment')}</Text>
-            <Card style={styles.sectionCard}>
+          {issues.length > 0 ? (
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardHeaderText}>{t('diagnose.issues')}</Text>
+              </View>
+              {issues.map((issue, index) => {
+                const percent = Math.round(issue.probability * 100);
+                const tone = confidenceFor(index);
+                return (
+                  <View key={issue.name} style={styles.finding}>
+                    <View style={styles.findingTop}>
+                      <Text style={styles.findingLabel}>{issue.name}</Text>
+                      <Text style={[styles.findingPercent, { color: tone.text }]}>{percent}%</Text>
+                    </View>
+                    <View style={styles.track}>
+                      <View
+                        testID={`issue-bar-${index}`}
+                        style={[
+                          styles.trackFill,
+                          { backgroundColor: tone.fill, width: `${percent}%` },
+                        ]}
+                      />
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          ) : null}
+
+          {topIssue?.treatmentHints?.length ? (
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardHeaderText}>{t('diagnose.treatment')}</Text>
+              </View>
               {topIssue.treatmentHints.map((hint, index) => (
-                <View key={hint} style={styles.stepRow}>
-                  <View style={styles.stepBadge}>
+                <View
+                  key={hint}
+                  style={[
+                    styles.step,
+                    index < topIssue.treatmentHints.length - 1 && styles.divided,
+                  ]}
+                >
+                  <View style={styles.stepTile}>
                     <Text style={styles.stepNumber}>{index + 1}</Text>
                   </View>
                   <Text style={styles.stepText}>{hint}</Text>
                 </View>
               ))}
-            </Card>
-          </>
-        ) : null}
+            </View>
+          ) : null}
 
-        {waterDays ? (
-          <Text testID="water-line" style={styles.waterLine}>
-            💧 {t('diagnose.waterLine', { count: waterDays })}
-          </Text>
-        ) : null}
+          {isHealthy ? (
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardHeaderText}>{t('diagnose.checked')}</Text>
+              </View>
+              {[t('diagnose.checkedLeaves'), t('diagnose.checkedNext')].map((line, index) => (
+                <View key={line} style={[styles.step, index === 0 && styles.divided]}>
+                  <Ionicons name="checkmark" size={14} color={colors.primary} />
+                  <Text style={styles.stepText}>{line}</Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
 
-        <View style={styles.actions}>
-          <Button
-            testID="diagnose-save"
-            label={savedTo ? t('diagnose.saved') : t('diagnose.saveToPlant')}
-            onPress={() => setSaveOpen(true)}
-            disabled={Boolean(savedTo)}
-          />
-          <Button
-            testID="diagnose-ask"
-            variant={diagnosis?.lowConfidence ? 'terracotta' : 'ghost'}
-            label={t('diagnose.askCommunity')}
-            onPress={askCommunity}
-          />
-          <Text style={styles.communityHint}>{t('diagnose.communityHint')}</Text>
-          <Button
-            testID="diagnose-done"
-            variant="ghost"
-            label={t('diagnose.done')}
-            onPress={finish}
-          />
+          {waterDays ? (
+            <Text testID="water-line" style={styles.waterLine}>
+              {t('diagnose.waterLine', { count: waterDays })}
+            </Text>
+          ) : null}
+
+          <View style={styles.actions}>
+            <Button
+              testID="diagnose-save"
+              label={savedTo ? t('diagnose.saved') : t('diagnose.saveToPlant')}
+              onPress={() => setSaveOpen(true)}
+              disabled={Boolean(savedTo)}
+            />
+            <Pressable
+              testID="diagnose-ask"
+              accessibilityRole="button"
+              onPress={askCommunity}
+              style={({ pressed }) => [styles.communityRow, pressed && styles.communityRowPressed]}
+            >
+              <View style={styles.communityLeft}>
+                <View style={styles.avatars}>
+                  {AVATAR_TINTS.map((tint, index) => (
+                    <View
+                      key={tint}
+                      style={[
+                        styles.avatar,
+                        { backgroundColor: tint },
+                        index > 0 && styles.avatarStacked,
+                      ]}
+                    />
+                  ))}
+                </View>
+                <Text style={styles.communityLabel}>{t('diagnose.askCommunity')}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color={colors.sage} />
+            </Pressable>
+            <Button
+              testID="diagnose-done"
+              variant="ghost"
+              label={t('diagnose.done')}
+              onPress={finish}
+            />
+          </View>
         </View>
       </ScrollView>
 
@@ -515,7 +642,7 @@ export default function CameraModal() {
       >
         <View style={styles.sheetBackdrop}>
           <Pressable style={styles.backdropTouch} onPress={() => setSaveOpen(false)} />
-          <View style={styles.sheet}>
+          <View style={styles.saveSheet}>
             <Text style={[styles.sheetTitle, { fontFamily: displayFont }]}>
               {t('diagnose.saveToPlant')}
             </Text>
@@ -533,7 +660,7 @@ export default function CameraModal() {
             ))}
             <Button
               testID="save-new-plant"
-              variant="ghost"
+              variant="secondary"
               label={t('diagnose.newPlant')}
               onPress={goToNewPlant}
             />
@@ -549,7 +676,7 @@ export default function CameraModal() {
       >
         <View style={styles.sheetBackdrop}>
           <Pressable style={styles.backdropTouch} onPress={() => setAskOpen(false)} />
-          <View style={styles.sheet}>
+          <View style={styles.saveSheet}>
             <Text style={[styles.sheetTitle, { fontFamily: displayFont }]}>
               {t('diagnose.askCommunity')}
             </Text>
@@ -577,14 +704,14 @@ export default function CameraModal() {
             />
             <Button
               testID="ask-cancel"
-              variant="ghost"
+              variant="secondary"
               label={t('camera.close')}
               onPress={() => setAskOpen(false)}
             />
           </View>
         </View>
       </Modal>
-    </Screen>
+    </View>
   );
 }
 
@@ -598,7 +725,7 @@ const styles = StyleSheet.create({
   },
   devChip: {
     alignSelf: 'center',
-    backgroundColor: colors.terracotta,
+    backgroundColor: colors.ink,
     borderRadius: radii.pill,
     marginTop: spacing.xl,
     paddingHorizontal: spacing.md,
@@ -608,13 +735,13 @@ const styles = StyleSheet.create({
     zIndex: 5,
   },
   devChipText: {
-    color: colors.cream,
+    color: colors.surface,
     fontFamily: fonts.bodyBold,
     fontSize: typeScale.micro,
   },
   modeRow: {
     alignSelf: 'center',
-    backgroundColor: colors.cream,
+    backgroundColor: colors.surface,
     borderRadius: radii.pill,
     bottom: 120,
     flexDirection: 'row',
@@ -635,7 +762,7 @@ const styles = StyleSheet.create({
     fontSize: typeScale.caption,
   },
   modeLabelActive: {
-    color: colors.cream,
+    color: colors.surface,
   },
   controls: {
     alignItems: 'center',
@@ -656,7 +783,7 @@ const styles = StyleSheet.create({
   },
   captureBtn: {
     alignItems: 'center',
-    backgroundColor: colors.cream,
+    backgroundColor: colors.surface,
     borderRadius: radii.pill,
     height: 72,
     justifyContent: 'center',
@@ -712,181 +839,265 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   resultScreen: {
-    paddingHorizontal: 0,
+    backgroundColor: colors.bg,
+    flex: 1,
   },
   resultContent: {
-    paddingBottom: spacing.xxl,
-    paddingHorizontal: spacing.lg,
+    flexGrow: 1,
+    paddingBottom: spacing.lg,
   },
-  heroWrap: {
-    position: 'relative',
-  },
-  heroPhoto: {
-    borderRadius: radii.lg,
-    height: 200,
-    marginTop: spacing.md,
+  photoHeader: {
+    backgroundColor: colors.chipFill,
+    height: 246,
     width: '100%',
   },
-  heroPill: {
-    backgroundColor: colors.primaryDeep,
-    borderRadius: radii.pill,
-    bottom: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    position: 'absolute',
-    right: spacing.sm,
+  photoHeaderImage: {
+    height: '100%',
+    width: '100%',
   },
-  heroPillText: {
-    color: colors.cream,
-    fontFamily: fonts.bodyBold,
-    fontSize: typeScale.micro,
+  backButton: {
+    alignItems: 'center',
+    backgroundColor: colors.scrim,
+    borderRadius: radii.md,
+    height: 36,
+    justifyContent: 'center',
+    left: 14,
+    position: 'absolute',
+    top: 62,
+    width: 36,
+  },
+  sheet: {
+    backgroundColor: colors.bg,
+    borderTopLeftRadius: radii.xl,
+    borderTopRightRadius: radii.xl,
+    flex: 1,
+    gap: spacing.md,
+    marginTop: -20,
+    paddingBottom: 18,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+  },
+  titleRow: {
+    alignItems: 'baseline',
+    flexDirection: 'row',
+    gap: spacing.sm,
+    justifyContent: 'space-between',
+  },
+  plantName: {
+    color: colors.ink,
+    flexShrink: 1,
+    fontSize: typeScale.heading,
+  },
+  plantMeta: {
+    color: colors.sage,
+    fontFamily: fonts.bodySemi,
+    fontSize: typeScale.meta,
   },
   banner: {
     alignItems: 'center',
+    borderRadius: radii.lg,
     flexDirection: 'row',
     gap: spacing.md,
-    marginTop: spacing.md,
+    paddingHorizontal: spacing.card,
+    paddingVertical: 14,
+  },
+  bannerAttention: {
+    backgroundColor: colors.ink,
   },
   bannerHealthy: {
-    backgroundColor: colors.greenTint,
-  },
-  bannerIssue: {
-    backgroundColor: colors.terracottaTint,
+    backgroundColor: colors.primary,
   },
   bannerBadge: {
     alignItems: 'center',
-    borderRadius: radii.pill,
-    height: 34,
+    borderRadius: radii.badge,
+    height: 32,
     justifyContent: 'center',
-    width: 34,
+    width: 32,
+  },
+  badgeAttention: {
+    backgroundColor: colors.badgeOnInk,
   },
   badgeHealthy: {
-    backgroundColor: colors.primary,
-  },
-  badgeIssue: {
-    backgroundColor: colors.terracotta,
+    backgroundColor: colors.badgeOnGreen,
   },
   bannerTextWrap: {
     flex: 1,
   },
   bannerTitle: {
-    color: colors.ink,
-    fontSize: typeScale.heading,
+    color: colors.onPrimary,
+    fontFamily: fonts.display,
+    fontSize: 15.5,
   },
   bannerSub: {
-    color: colors.mutedText,
     fontFamily: fonts.body,
-    fontSize: typeScale.caption,
+    fontSize: typeScale.meta,
+  },
+  bannerSubAttention: {
+    color: colors.subOnInk,
+  },
+  bannerSubHealthy: {
+    color: colors.subOnGreen,
   },
   lowConfidence: {
-    color: colors.terracotta,
+    color: colors.mutedText,
     fontFamily: fonts.bodySemi,
     fontSize: typeScale.caption,
-    marginTop: spacing.sm,
   },
-  sectionLabel: {
-    color: colors.mutedText,
-    fontFamily: fonts.bodyBold,
-    fontSize: typeScale.micro,
-    letterSpacing: 1.5,
-    marginBottom: spacing.sm,
-    marginTop: spacing.lg,
-    textTransform: 'uppercase',
+  card: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    paddingBottom: spacing.sm,
+    paddingHorizontal: spacing.card,
+    paddingTop: spacing.xs,
   },
-  sectionCard: {
-    gap: spacing.md,
+  cardHeader: {
+    borderBottomColor: colors.divider,
+    borderBottomWidth: 1,
+    justifyContent: 'center',
+    minHeight: 34,
   },
-  speciesLine: {
+  cardHeaderText: {
     color: colors.ink,
-    fontFamily: fonts.bodySemi,
-    fontSize: typeScale.body,
-    marginTop: spacing.md,
+    fontFamily: fonts.display,
+    fontSize: 12,
   },
-  rowCard: {
-    marginBottom: spacing.sm,
+  divided: {
+    borderBottomColor: colors.divider,
+    borderBottomWidth: 1,
   },
-  rowDisabled: {
-    opacity: 0.5,
+  finding: {
+    gap: 6,
+    paddingVertical: 10,
   },
-  rowName: {
-    color: colors.ink,
-    fontFamily: fonts.bodyBold,
-    fontSize: typeScale.body,
-  },
-  rowSci: {
-    color: colors.mutedText,
-    fontFamily: fonts.body,
-    fontSize: typeScale.caption,
-    marginTop: 2,
-  },
-  issueRow: {
-    gap: spacing.xs,
-  },
-  issueTop: {
+  findingTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  issueName: {
+  findingLabel: {
     color: colors.ink,
-    fontFamily: fonts.bodySemi,
-    fontSize: typeScale.caption,
-  },
-  issuePercent: {
-    color: colors.terracotta,
     fontFamily: fonts.bodyBold,
     fontSize: typeScale.caption,
   },
-  barTrack: {
-    backgroundColor: colors.hairline,
+  findingPercent: {
+    fontFamily: fonts.bodyBold,
+    fontSize: typeScale.caption,
+  },
+  track: {
+    backgroundColor: colors.track,
     borderRadius: radii.pill,
-    height: 5,
+    height: 4,
     overflow: 'hidden',
   },
-  barFill: {
-    backgroundColor: colors.terracotta,
+  trackFill: {
     borderRadius: radii.pill,
-    height: 5,
+    height: 4,
   },
-  stepRow: {
-    alignItems: 'flex-start',
+  step: {
+    alignItems: 'center',
     flexDirection: 'row',
     gap: spacing.md,
+    paddingVertical: 10,
   },
-  stepBadge: {
+  stepTile: {
     alignItems: 'center',
-    backgroundColor: colors.greenTint,
-    borderRadius: radii.pill,
-    height: 24,
+    backgroundColor: colors.chipFill,
+    borderRadius: radii.xs,
+    height: 22,
     justifyContent: 'center',
-    width: 24,
+    width: 22,
   },
   stepNumber: {
-    color: colors.primary,
-    fontFamily: fonts.bodyBold,
+    color: colors.ink,
+    fontFamily: fonts.display,
     fontSize: typeScale.micro,
   },
   stepText: {
-    color: colors.ink,
+    color: colors.inkBody,
     flex: 1,
     fontFamily: fonts.body,
     fontSize: typeScale.caption,
     lineHeight: 19,
   },
-  waterLine: {
-    color: colors.primary,
-    fontFamily: fonts.bodySemi,
-    fontSize: typeScale.body,
-    marginTop: spacing.lg,
+  suggestion: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.md,
+    paddingVertical: 10,
   },
-  actions: {
-    gap: spacing.sm,
-    marginTop: spacing.xl,
+  suggestionText: {
+    flex: 1,
   },
-  communityHint: {
+  adoptError: {
     color: colors.mutedText,
     fontFamily: fonts.body,
     fontSize: typeScale.micro,
-    textAlign: 'center',
+    paddingHorizontal: spacing.card,
+    paddingVertical: spacing.sm,
+  },
+  rowName: {
+    color: colors.ink,
+    fontFamily: fonts.bodyBold,
+    fontSize: typeScale.caption,
+  },
+  rowSci: {
+    color: colors.sage,
+    fontFamily: fonts.body,
+    fontSize: typeScale.micro,
+    marginTop: 2,
+  },
+  rowMatch: {
+    color: colors.primaryDeep,
+    fontFamily: fonts.bodyBold,
+    fontSize: typeScale.caption,
+  },
+  waterLine: {
+    color: colors.primaryDeep,
+    fontFamily: fonts.bodySemi,
+    fontSize: typeScale.caption,
+  },
+  actions: {
+    gap: 9,
+    marginTop: 'auto',
+    paddingTop: spacing.sm,
+  },
+  communityRow: {
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radii.card,
+    borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    minHeight: 48,
+    paddingHorizontal: 14,
+  },
+  communityRowPressed: {
+    backgroundColor: colors.chipFill,
+  },
+  communityLeft: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  avatars: {
+    flexDirection: 'row',
+  },
+  avatar: {
+    borderColor: colors.surface,
+    borderRadius: radii.pill,
+    borderWidth: 1.5,
+    height: 22,
+    width: 22,
+  },
+  avatarStacked: {
+    marginLeft: -8,
+  },
+  communityLabel: {
+    color: colors.ink,
+    fontFamily: fonts.bodyBold,
+    fontSize: 13,
   },
   sheetBackdrop: {
     flex: 1,
@@ -895,15 +1106,18 @@ const styles = StyleSheet.create({
   backdropTouch: {
     flex: 1,
   },
-  sheet: {
-    backgroundColor: colors.cream,
+  saveSheet: {
+    backgroundColor: colors.surface,
     borderTopLeftRadius: radii.xl,
     borderTopRightRadius: radii.xl,
     gap: spacing.sm,
-    padding: spacing.xl,
+    padding: spacing.page,
   },
   sheetTitle: {
     color: colors.ink,
     fontSize: typeScale.title,
+  },
+  rowCard: {
+    marginBottom: spacing.sm,
   },
 });

@@ -151,17 +151,26 @@ export function createPostsService({ prisma, mapImage = identityImage, attachIma
      * is a Post: the diagnoses service calls in with the attachment it has
      * already validated.
      *
+     * `body` is the text the person reviewed in the composer — the drafted post
+     * they read and edited. It wins over the canned sentence whenever it is
+     * present, so what gets published is what they saw. The fallback exists for
+     * the case where drafting was unavailable, not as the normal path.
+     *
      * @param {{id: string}} user
      * @param {{imageUri: string|null, topIssue: string|null, confidence: number|null}} attachment
+     * @param {string} [body] the reviewed post text
      */
-    async createHelpPost(user, attachment) {
+    async createHelpPost(user, attachment, body) {
+      const reviewed = typeof body === 'string' ? body.trim() : '';
       const post = await prisma.post.create({
         data: {
           authorId: user.id,
           type: 'HELP',
-          body: attachment.topIssue
-            ? `Need help with my plant — the diagnosis suggests "${attachment.topIssue}". Any advice?`
-            : 'Need help figuring out what is wrong with my plant. Any advice?',
+          body:
+            reviewed ||
+            (attachment.topIssue
+              ? `Need help with my plant — the diagnosis suggests "${attachment.topIssue}". Any advice?`
+              : 'Need help figuring out what is wrong with my plant. Any advice?'),
           images: attachment.imageUri ? [attachment.imageUri] : [],
           attachment,
         },

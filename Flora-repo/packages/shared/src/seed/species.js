@@ -3,7 +3,7 @@
  * climate zone: cool mountain air stretches the interval (>1), the hot dry Bekaa
  * shortens it (<1).
  */
-export const seedSpecies = [
+const CURATED = [
   {
     id: 'sp1',
     scientificName: 'Ocimum basilicum',
@@ -75,3 +75,14 @@ export const seedSpecies = [
     zoneMultipliers: { COASTAL: 1, MOUNTAIN: 1.35, BEKAA: 0.8, SOUTH: 0.9 },
   },
 ];
+
+/**
+ * The curated catalog, every row tagged CATALOG.
+ *
+ * Applied here rather than repeated ten times: `source` distinguishes these
+ * hand-written entries from species the app adopts on demand, whose care data
+ * a model wrote. The API's Species table defaults the same column to CATALOG,
+ * so a seeded row and a mock row are the same shape — which is what the client
+ * contract compares.
+ */
+export const seedSpecies = CURATED.map((species) => ({ ...species, source: 'CATALOG' }));

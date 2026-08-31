@@ -7,8 +7,8 @@ import { colors } from '../theme.js';
  *
  * The arc fills as the plant works through its watering cycle, so a glance at
  * the garden grid reads as "this one is nearly due" without parsing a date. It
- * turns terracotta once the plant is due, matching WaterChip — the two must
- * never disagree, so both read from the same `waterStatus`/`waterProgress`
+ * deepens to the due green once the plant is due, matching WaterChip — the two
+ * must never disagree, so both read from the same `waterStatus`/`waterProgress`
  * pair.
  *
  * Decorative: the ring carries no touch target of its own. Watering is
@@ -27,7 +27,7 @@ export function WaterRing({ progress, size, due = false, strokeWidth = 3, childr
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const clamped = Math.min(1, Math.max(0, progress));
-  const color = due ? colors.terracotta : colors.primary;
+  const color = due ? colors.primaryDeep : colors.primary;
 
   return (
     <View style={[styles.wrap, { height: size, width: size }]}>
@@ -43,7 +43,7 @@ export function WaterRing({ progress, size, due = false, strokeWidth = 3, childr
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={colors.hairline}
+          stroke={colors.track}
           strokeWidth={strokeWidth}
           fill="none"
         />

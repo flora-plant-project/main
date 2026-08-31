@@ -168,7 +168,7 @@ export default function PlantDetailScreen() {
         <CareCardlet
           testID="care-sun"
           icon="sunny-outline"
-          iconColor={colors.terracotta}
+          iconColor={colors.sage}
           label={t('plantDetail.sun')}
           value={species?.care.sun ?? '—'}
         />
@@ -201,7 +201,8 @@ export default function PlantDetailScreen() {
         <Button
           testID="timeline-add-log"
           label={t('plantDetail.addLog')}
-          variant="terracotta"
+          variant="secondary"
+          size="sm"
           onPress={() => setSheetOpen(true)}
           style={styles.addLogButton}
         />
@@ -241,7 +242,7 @@ export default function PlantDetailScreen() {
             <Ionicons
               name={item.isHealthy ? 'checkmark-circle' : 'alert-circle'}
               size={18}
-              color={item.isHealthy ? colors.primary : colors.terracotta}
+              color={item.isHealthy ? colors.primary : colors.ink}
             />
             <Text style={styles.bannerText}>
               {item.isHealthy
@@ -341,7 +342,7 @@ export default function PlantDetailScreen() {
             />
             <Button
               testID="cancel-water"
-              variant="ghost"
+              variant="secondary"
               label={t('plantDetail.cancelWater')}
               onPress={() => setConfirmWater(false)}
             />
@@ -452,7 +453,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.greenTint,
   },
   bannerIssue: {
-    backgroundColor: colors.terracottaTint,
+    backgroundColor: colors.chipFill,
   },
   bannerRow: {
     alignItems: 'center',
@@ -472,7 +473,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sheet: {
-    backgroundColor: colors.cream,
+    backgroundColor: colors.surface,
     borderTopLeftRadius: radii.xl,
     borderTopRightRadius: radii.xl,
     gap: spacing.sm,

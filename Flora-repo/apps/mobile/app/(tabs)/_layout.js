@@ -2,9 +2,9 @@ import { Tabs, useRouter } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { colors, fonts, typeScale } from '../../src/theme.js';
+import { colors, fonts, radii, typeScale } from '../../src/theme.js';
 
-/** Raised 60px circular camera button with a 5px cream ring (screen 1c). */
+/** Raised 58px camera button with a 4px white ring (design 3c). */
 function CameraButton() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -15,13 +15,19 @@ function CameraButton() {
         accessibilityRole="button"
         accessibilityLabel={t('tabs.camera')}
         onPress={() => router.push('/camera')}
-        style={styles.cameraButton}
+        style={({ pressed }) => [styles.cameraButton, pressed && styles.cameraButtonPressed]}
       >
-        <Ionicons name="camera" size={26} color={colors.cream} />
+        <Ionicons name="camera-outline" size={25} color={colors.onPrimary} />
       </Pressable>
     </View>
   );
 }
+
+/** Stroked 22px tab icon — icon and label share the tab's tint. */
+const tabIcon = (name) =>
+  function TabIcon({ color }) {
+    return <Ionicons name={name} size={22} color={color} />;
+  };
 
 export default function TabsLayout() {
   const { t } = useTranslation();
@@ -38,21 +44,11 @@ export default function TabsLayout() {
     >
       <Tabs.Screen
         name="index"
-        options={{
-          title: t('tabs.garden'),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="leaf-outline" size={size} color={color} />
-          ),
-        }}
+        options={{ title: t('tabs.garden'), tabBarIcon: tabIcon('leaf-outline') }}
       />
       <Tabs.Screen
         name="explore"
-        options={{
-          title: t('tabs.explore'),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="compass-outline" size={size} color={color} />
-          ),
-        }}
+        options={{ title: t('tabs.explore'), tabBarIcon: tabIcon('search-outline') }}
       />
       <Tabs.Screen
         name="scan"
@@ -63,21 +59,11 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="community"
-        options={{
-          title: t('tabs.community'),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="chatbubbles-outline" size={size} color={color} />
-          ),
-        }}
+        options={{ title: t('tabs.community'), tabBarIcon: tabIcon('people-outline') }}
       />
       <Tabs.Screen
         name="profile"
-        options={{
-          title: t('tabs.profile'),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
-          ),
-        }}
+        options={{ title: t('tabs.profile'), tabBarIcon: tabIcon('person-outline') }}
       />
     </Tabs>
   );
@@ -85,33 +71,40 @@ export default function TabsLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: colors.cream,
+    backgroundColor: colors.surface,
+    borderTopColor: colors.border,
     borderTopWidth: 1,
-    borderTopColor: colors.hairline,
-    height: 64,
+    height: 78,
+    paddingBottom: 22,
+    paddingHorizontal: 12,
+    paddingTop: 9,
   },
   tabLabel: {
-    fontFamily: fonts.bodySemi,
-    fontSize: typeScale.micro,
+    fontFamily: fonts.bodyBold,
+    fontSize: typeScale.tab,
   },
   cameraSlot: {
-    flex: 1,
     alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
   },
   cameraButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginTop: -22,
     alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: colors.primary,
-    borderWidth: 5,
-    borderColor: colors.cream,
-    elevation: 4,
-    shadowColor: colors.ink,
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
+    borderColor: colors.surface,
+    borderRadius: radii.pill,
+    borderWidth: 4,
+    elevation: 5,
+    height: 58,
+    justifyContent: 'center',
+    marginTop: -22,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.34,
+    shadowRadius: 18,
+    width: 58,
+  },
+  cameraButtonPressed: {
+    backgroundColor: colors.primaryPressed,
   },
 });

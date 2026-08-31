@@ -80,7 +80,7 @@ export default function RemindersScreen() {
       {isMock ? (
         <Button
           testID="dev-remind-2m"
-          variant="terracotta"
+          variant="dark"
           label={t('reminders.devRemind')}
           onPress={remindInTwoMinutes}
           style={styles.devButton}

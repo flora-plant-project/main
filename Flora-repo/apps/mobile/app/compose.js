@@ -119,7 +119,7 @@ export default function ComposeScreen() {
     return (
       <Screen edges={['top', 'bottom']}>
         <View testID="pending-banner" style={styles.pendingBanner}>
-          <Ionicons name="eye-off-outline" size={28} color={colors.terracotta} />
+          <Ionicons name="eye-off-outline" size={28} color={colors.ink} />
           <Text style={[styles.pendingTitle, { fontFamily: displayFont }]}>
             {t('compose.pendingBanner')}
           </Text>
@@ -149,7 +149,7 @@ export default function ComposeScreen() {
         </Reveal>
         <Button
           testID="compose-draft"
-          variant="ghost"
+          variant="secondary"
           label={drafting ? t('compose.drafting') : t('compose.draftForMe')}
           onPress={() => setDraftOpen(true)}
           disabled={drafting}
@@ -178,7 +178,7 @@ export default function ComposeScreen() {
         {isMock ? (
           <Button
             testID="dev-flagged-image"
-            variant="terracotta"
+            variant="dark"
             label={t('compose.devFlagged')}
             onPress={addFlaggedDemoImage}
             disabled={images.length >= MAX_IMAGES}
@@ -253,6 +253,14 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginBottom: spacing.md,
   },
+  thumb: {
+    borderRadius: radii.md,
+    height: 72,
+    width: 72,
+  },
+  rowButton: {
+    marginTop: spacing.sm,
+  },
   sheetBackdrop: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -261,11 +269,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sheet: {
-    backgroundColor: colors.bg,
+    backgroundColor: colors.surface,
     borderTopLeftRadius: radii.xl,
     borderTopRightRadius: radii.xl,
     gap: spacing.sm,
-    padding: spacing.lg,
+    padding: spacing.page,
   },
   sheetTitle: {
     color: colors.ink,
@@ -275,26 +283,18 @@ const styles = StyleSheet.create({
   sheetHint: {
     color: colors.mutedText,
     fontFamily: fonts.body,
-    fontSize: typeScale.body,
+    fontSize: typeScale.caption,
   },
   rowCard: {
     marginBottom: spacing.sm,
   },
   rowName: {
     color: colors.ink,
-    fontFamily: fonts.bodySemi,
+    fontFamily: fonts.bodyBold,
     fontSize: typeScale.body,
   },
-  thumb: {
-    borderRadius: radii.md,
-    height: 72,
-    width: 72,
-  },
-  rowButton: {
-    marginTop: spacing.sm,
-  },
   error: {
-    color: colors.terracotta,
+    color: colors.ink,
     fontFamily: fonts.body,
     fontSize: typeScale.caption,
     marginTop: spacing.md,
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   },
   pendingBanner: {
     alignItems: 'center',
-    backgroundColor: colors.terracottaTint,
+    backgroundColor: colors.chipFill,
     borderRadius: radii.lg,
     gap: spacing.sm,
     marginBottom: spacing.lg,

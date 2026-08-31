@@ -13,7 +13,7 @@ export const seedPlants = [
   {
     id: 'p2',
     ownerId: 'u1',
-    nickname: 'بندورة الست',
+    nickname: 'Tommy',
     speciesId: 'sp2',
     photoKey: 'assets/demo/plant-2.jpg',
     createdAt: '2026-06-25T08:30:00.000Z',
@@ -43,7 +43,7 @@ export const seedPlants = [
   {
     id: 'p5',
     ownerId: 'u1',
-    nickname: 'صبورة',
+    nickname: 'Spike',
     speciesId: 'sp8',
     photoKey: 'assets/demo/plant-5.jpg',
     createdAt: '2026-07-18T09:15:00.000Z',
@@ -68,7 +68,7 @@ export const seedGrowthLogs = [
     id: 'gl1',
     plantId: 'p1',
     photoKey: 'assets/demo/plant-1.jpg',
-    note: 'أول ورقة جديدة!',
+    note: 'First new leaf!',
     createdAt: '2026-07-25T09:00:00.000Z',
   },
   {

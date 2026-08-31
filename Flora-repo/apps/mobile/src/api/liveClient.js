@@ -93,6 +93,23 @@ export const liveClient = {
       return apiFetch('/species', { query: { q: query ?? '' } });
     },
 
+    /**
+     * Species the catalog does not have yet, from the provider's name database.
+     * Rows carry no id — they are not real until adopted.
+     * @param {string} query
+     */
+    async suggest(query) {
+      return apiFetch('/species/suggest', { query: { q: query ?? '' } });
+    },
+
+    /**
+     * Give a suggestion a catalog row so a plant can point at it.
+     * @param {{scientificName: string, commonNames?: string[]}} input
+     */
+    async adopt(input) {
+      return apiFetch('/species/adopt', { method: 'POST', body: input });
+    },
+
     /** @param {string} id */
     async get(id) {
       return apiFetch(`/species/${encodeURIComponent(id)}`);
@@ -284,9 +301,23 @@ export const liveClient = {
       });
     },
 
-    /** @param {string} id */
-    async escalate(id) {
-      return apiFetch(`/diagnoses/${encodeURIComponent(id)}/escalate`, { method: 'POST' });
+    /**
+     * Escalate a completed diagnosis into a community HELP post.
+     *
+     * `body` is the reviewed draft from the ask sheet. It has to travel with the
+     * request — the API cannot reconstruct it — and omitting it is what used to
+     * publish the canned fallback under the user's name no matter what they had
+     * read and edited.
+     *
+     * @param {string} id
+     * @param {{body?: string}} [input]
+     */
+    async escalate(id, input = {}) {
+      const body = input?.body?.trim();
+      return apiFetch(`/diagnoses/${encodeURIComponent(id)}/escalate`, {
+        method: 'POST',
+        body: body ? { body } : {},
+      });
     },
   },
 

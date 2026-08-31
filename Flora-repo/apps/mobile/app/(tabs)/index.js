@@ -1,30 +1,33 @@
-import { useMemo } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { FlatList, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
-import { Ionicons } from '@expo/vector-icons';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { client } from '../../src/api/index.js';
 import { unwrap } from '../../src/utils/api.js';
-import { needsWaterToday } from '../../src/utils/watering.js';
+import { needsWaterToday, waterStatus } from '../../src/utils/watering.js';
+import { PLACEMENTS, placementFor } from '../../src/utils/placement.js';
 import { Screen } from '../../src/components/Screen.js';
 import { PlantCard } from '../../src/components/PlantCard.js';
+import { SegmentedFilter } from '../../src/components/SegmentedFilter.js';
+import { TodayCard } from '../../src/components/TodayCard.js';
+import { EmptyGardenArt } from '../../src/components/EmptyGardenArt.js';
 import { Button } from '../../src/components/Button.js';
 import { useAuthStore } from '../../src/store/authStore.js';
 import { colors, fonts, radii, spacing, typeScale } from '../../src/theme.js';
 
-function greetingKey(hour) {
-  if (hour < 12) return 'garden.greetingMorning';
-  if (hour < 18) return 'garden.greetingAfternoon';
-  return 'garden.greetingEvening';
-}
-
-/** Screen 1a: the garden home — greeting, due summary, 2-column plant grid. */
+/** Screen 3a: app bar, segmented filters, today's tasks, 2-column plant grid. */
 export default function GardenScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const user = useAuthStore((state) => state.user);
   const displayFont = i18n.language === 'ar' ? fonts.displayArabic : fonts.display;
+
+  const [filter, setFilter] = useState('all');
+  // Tasks stay on the card once checked off, even though watering pushes the
+  // plant's nextDueAt into the future and out of the "due today" set.
+  const [doneIds, setDoneIds] = useState(() => []);
 
   const plantsQuery = useQuery({
     queryKey: ['plants'],
@@ -48,53 +51,136 @@ export default function GardenScreen() {
     const [en, ar] = species.commonNames;
     return i18n.language === 'ar' && ar ? ar : (en ?? species.scientificName);
   };
+  const placementOf = (plant) => placementFor(speciesById.get(plant.speciesId));
 
-  const dueCount = plants.filter((plant) => needsWaterToday(plant.nextDueAt)).length;
-  const name = user?.displayName ?? user?.username ?? '';
+  const watered = useMutation({
+    mutationFn: (plantId) => client.plants.markWatered(plantId).then(unwrap),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['plants'] }),
+  });
 
-  const header = (
-    <View style={styles.header}>
-      <View style={styles.headerRow}>
-        <Text style={[styles.greeting, { fontFamily: displayFont }]}>
-          {t(greetingKey(new Date().getHours()), { name })}
-        </Text>
+  const toggleTask = (plantId) => {
+    if (doneIds.includes(plantId)) return; // watering is not undoable from here
+    setDoneIds((current) => [...current, plantId]);
+    watered.mutate(plantId);
+  };
+
+  const tasks = plants
+    .filter((plant) => needsWaterToday(plant.nextDueAt) || doneIds.includes(plant.id))
+    .map((plant) => {
+      const subtitleParts = [speciesName(plant), t(`garden.filters.${placementOf(plant)}`)];
+      return {
+        id: plant.id,
+        title: t('garden.taskWater', { name: plant.nickname }),
+        subtitle: subtitleParts.filter(Boolean).join(' · '),
+        meta:
+          waterStatus(plant.nextDueAt).key === 'waterNow' ? t('garden.now') : t('garden.dueToday'),
+        done: doneIds.includes(plant.id),
+      };
+    });
+
+  const visiblePlants =
+    filter === 'all' ? plants : plants.filter((plant) => placementOf(plant) === filter);
+
+  const initial = (user?.displayName ?? user?.username ?? '?').charAt(0).toUpperCase();
+  const isEmpty = plants.length === 0 && !plantsQuery.isLoading;
+
+  const appBar = (
+    <View style={[styles.appBar, isEmpty && styles.appBarEmpty]}>
+      <View style={styles.appBarRow}>
+        <View style={styles.titleBlock}>
+          <Text style={[styles.title, { fontFamily: displayFont }]}>{t('garden.title')}</Text>
+          <Text style={styles.subtitle}>
+            {isEmpty
+              ? t('garden.nothingPlanted')
+              : `${t('garden.plantCount', { count: plants.length })} · ${t('garden.city')}`}
+          </Text>
+        </View>
         <View style={styles.avatar}>
-          <Text style={styles.avatarInitial}>{(name || '?').charAt(0).toUpperCase()}</Text>
+          <Text style={styles.avatarInitial}>{initial}</Text>
         </View>
       </View>
-      <Text style={styles.dueLine}>
-        {dueCount > 0 ? t('garden.needWater', { count: dueCount }) : t('garden.allHappy')}
-      </Text>
+      {isEmpty ? null : (
+        <SegmentedFilter
+          options={PLACEMENTS.map((key) => ({ key, label: t(`garden.filters.${key}`) }))}
+          value={filter}
+          onChange={setFilter}
+          testIDPrefix="garden-filter"
+        />
+      )}
     </View>
   );
 
-  const empty = plantsQuery.isLoading ? null : (
-    <View style={styles.empty}>
-      <View style={styles.emptyBadge}>
-        <Ionicons name="flower-outline" size={64} color={colors.primary} />
+  if (isEmpty) {
+    return (
+      <Screen style={styles.screen} topColor={colors.surface}>
+        {appBar}
+        <ScrollView contentContainerStyle={styles.emptyScroll}>
+          <View style={styles.empty}>
+            <EmptyGardenArt />
+            <Text style={[styles.emptyTitle, { fontFamily: displayFont }]}>
+              {t('garden.emptyTitle')}
+            </Text>
+            <Text style={styles.emptyBody}>{t('garden.emptyBody')}</Text>
+            <Button
+              testID="garden-empty-cta"
+              icon="camera-outline"
+              label={t('garden.emptyPhoto')}
+              onPress={() => router.push('/add-plant?tab=photo')}
+              style={styles.emptyPrimary}
+            />
+            <Button
+              testID="garden-empty-search"
+              variant="secondary"
+              label={t('garden.emptySearch')}
+              onPress={() => router.push('/add-plant')}
+              style={styles.emptySecondary}
+            />
+            <Text
+              testID="garden-empty-popular"
+              accessibilityRole="link"
+              onPress={() => router.push('/explore')}
+              style={styles.emptyLink}
+            >
+              {t('garden.emptyPopular')}
+            </Text>
+          </View>
+        </ScrollView>
+      </Screen>
+    );
+  }
+
+  const listHeader = (
+    <View>
+      {tasks.length > 0 ? (
+        <View style={styles.todayWrap}>
+          <TodayCard tasks={tasks} onToggle={toggleTask} />
+        </View>
+      ) : null}
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{t('garden.allPlants')}</Text>
+        <Text
+          testID="garden-add-plant"
+          accessibilityRole="link"
+          onPress={() => router.push('/add-plant')}
+          style={styles.sectionAction}
+        >
+          {t('garden.addPlant')}
+        </Text>
       </View>
-      <Text style={[styles.emptyTitle, { fontFamily: displayFont }]}>{t('garden.emptyTitle')}</Text>
-      <Text style={styles.emptyBody}>{t('garden.emptyBody')}</Text>
-      <Button
-        testID="garden-empty-cta"
-        label={t('garden.emptyCta')}
-        onPress={() => router.push('/add-plant')}
-        style={styles.emptyCta}
-      />
     </View>
   );
 
   return (
-    <Screen style={styles.screen}>
+    <Screen style={styles.screen} topColor={colors.surface}>
+      {appBar}
       <FlatList
         testID="garden-list"
-        data={plants}
+        data={visiblePlants}
         keyExtractor={(plant) => plant.id}
         numColumns={2}
         columnWrapperStyle={styles.column}
         contentContainerStyle={styles.content}
-        ListHeaderComponent={header}
-        ListEmptyComponent={empty}
+        ListHeaderComponent={listHeader}
         renderItem={({ item }) => (
           <PlantCard
             plant={item}
@@ -111,15 +197,6 @@ export default function GardenScreen() {
           />
         }
       />
-      <Pressable
-        testID="garden-fab"
-        accessibilityRole="button"
-        accessibilityLabel={t('garden.emptyCta')}
-        onPress={() => router.push('/add-plant')}
-        style={styles.fab}
-      >
-        <Ionicons name="add" size={28} color={colors.cream} />
-      </Pressable>
     </Screen>
   );
 }
@@ -127,95 +204,121 @@ export default function GardenScreen() {
 const styles = StyleSheet.create({
   screen: {
     paddingHorizontal: 0,
+    paddingTop: 0,
   },
-  content: {
-    paddingBottom: spacing.xxl * 2,
-    paddingHorizontal: spacing.lg,
+  appBar: {
+    backgroundColor: colors.surface,
+    borderBottomColor: colors.border,
+    borderBottomWidth: 1,
+    paddingHorizontal: spacing.page,
+    paddingTop: spacing.sm,
   },
-  column: {
-    gap: spacing.md,
+  appBarEmpty: {
+    paddingBottom: 18,
   },
-  header: {
-    marginBottom: spacing.lg,
-  },
-  headerRow: {
-    alignItems: 'flex-start',
+  appBarRow: {
+    alignItems: 'center',
     flexDirection: 'row',
     gap: spacing.md,
     justifyContent: 'space-between',
   },
-  greeting: {
-    color: colors.ink,
+  titleBlock: {
     flex: 1,
+  },
+  title: {
+    color: colors.ink,
     fontSize: typeScale.display,
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    color: colors.mutedText,
+    fontFamily: fonts.body,
+    fontSize: typeScale.caption,
+    marginTop: 2,
   },
   avatar: {
     alignItems: 'center',
     backgroundColor: colors.greenTint,
-    borderColor: colors.border,
+    borderColor: colors.greenTintBorder,
     borderRadius: radii.pill,
     borderWidth: 1,
-    height: 42,
+    height: 40,
     justifyContent: 'center',
-    width: 42,
+    width: 40,
   },
   avatarInitial: {
-    color: colors.primary,
-    fontFamily: fonts.displaySemi,
-    fontSize: typeScale.body,
+    color: colors.primaryDeep,
+    fontFamily: fonts.display,
+    fontSize: 15,
   },
-  dueLine: {
-    color: colors.mutedText,
-    fontFamily: fonts.bodySemi,
+  content: {
+    paddingBottom: spacing.xxl * 2,
+    paddingHorizontal: spacing.page,
+  },
+  column: {
+    gap: spacing.md,
+  },
+  todayWrap: {
+    marginTop: spacing.lg,
+  },
+  sectionHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 11,
+    paddingTop: spacing.page,
+  },
+  sectionTitle: {
+    color: colors.ink,
+    fontFamily: fonts.display,
     fontSize: typeScale.caption,
-    marginTop: spacing.xs,
+  },
+  sectionAction: {
+    color: colors.primary,
+    fontFamily: fonts.bodyBold,
+    fontSize: typeScale.caption,
+  },
+  emptyScroll: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   empty: {
     alignItems: 'center',
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.xxl,
-  },
-  emptyBadge: {
-    alignItems: 'center',
-    backgroundColor: colors.hairline,
-    borderRadius: radii.pill,
-    height: 160,
-    justifyContent: 'center',
-    width: 160,
+    marginTop: -20,
+    paddingHorizontal: 36,
   },
   emptyTitle: {
     color: colors.ink,
     fontSize: typeScale.title,
-    marginTop: spacing.lg,
+    letterSpacing: -0.2,
+    marginTop: 22,
     textAlign: 'center',
   },
   emptyBody: {
     color: colors.mutedText,
     fontFamily: fonts.body,
-    fontSize: typeScale.body,
-    lineHeight: 22,
+    fontSize: typeScale.caption + 0.5,
+    lineHeight: 21,
     marginTop: spacing.sm,
+    maxWidth: 268,
     textAlign: 'center',
   },
-  emptyCta: {
-    borderRadius: radii.pill,
+  emptyPrimary: {
+    alignSelf: 'stretch',
     marginTop: spacing.xl,
-    paddingHorizontal: spacing.xxl,
+    maxWidth: 300,
+    width: '100%',
   },
-  fab: {
-    alignItems: 'center',
-    backgroundColor: colors.primary,
-    borderRadius: radii.pill,
-    bottom: spacing.lg,
-    elevation: 5,
-    height: 56,
-    justifyContent: 'center',
-    position: 'absolute',
-    right: spacing.lg,
-    shadowColor: colors.primaryDeep,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    width: 56,
+  emptySecondary: {
+    alignSelf: 'stretch',
+    marginTop: 10,
+    maxWidth: 300,
+    width: '100%',
+  },
+  emptyLink: {
+    color: colors.primary,
+    fontFamily: fonts.bodyBold,
+    fontSize: typeScale.caption,
+    marginTop: spacing.lg,
   },
 });

@@ -1,0 +1,8 @@
+# Local API keys, pasted by hand. Never commit: this file holds the Plant.id
+# key, the Gemini key and the Bedrock bearer token in plaintext.
+env
+
+# Working copies of the same secrets under any name.
+env.local
+*.env
+!*.env.example

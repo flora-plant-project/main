@@ -2,7 +2,7 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors, fonts, radii, spacing, typeScale } from '../theme.js';
 
 /**
- * Labelled text input with an inline (terracotta) validation message.
+ * Labelled text input with an inline (charcoal) validation message.
  */
 export function Field({ label, error, testID, style, ...inputProps }) {
   return (
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   input: {
-    backgroundColor: colors.cream,
+    backgroundColor: colors.surface,
     borderColor: colors.border,
     borderRadius: radii.md,
     borderWidth: 1,
@@ -43,10 +43,10 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   inputError: {
-    borderColor: colors.terracotta,
+    borderColor: colors.ink,
   },
   error: {
-    color: colors.terracotta,
+    color: colors.ink,
     fontFamily: fonts.body,
     fontSize: typeScale.caption,
     marginTop: spacing.xs,

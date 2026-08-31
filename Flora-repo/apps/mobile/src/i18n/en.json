@@ -7,27 +7,48 @@
     "profile": "Profile"
   },
   "garden": {
-    "title": "My Garden",
-    "greetingMorning": "Good morning, {{name}}",
-    "greetingAfternoon": "Good afternoon, {{name}}",
-    "greetingEvening": "Good evening, {{name}}",
-    "needWater_one": "{{count}} plant needs water today",
-    "needWater_other": "{{count}} plants need water today",
-    "allHappy": "All plants are happy today",
-    "emptyTitle": "Every jneineh starts with one pot",
-    "emptyBody": "Add your first plant and Flora will tell you how to keep it happy.",
-    "emptyCta": "Add your first plant",
+    "title": "My garden",
+    "city": "Beirut",
+    "plantCount_one": "{{count}} plant",
+    "plantCount_other": "{{count}} plants",
+    "nothingPlanted": "Nothing planted yet",
+    "filters": {
+      "all": "All",
+      "balcony": "Balcony",
+      "indoors": "Indoors"
+    },
+    "today": "Today",
+    "tasksLeft_one": "{{count}} left",
+    "tasksLeft_other": "{{count}} left",
+    "allDone": "All done",
+    "taskWater": "Water {{name}}",
+    "now": "Now",
+    "dueToday": "Today",
+    "allPlants": "All plants",
+    "addPlant": "Add plant",
+    "emptyTitle": "Add your first plant",
+    "emptyBody": "Take a photo and Flora names it, then builds a watering plan for Beirut weather.",
+    "emptyPhoto": "Take a photo",
+    "emptySearch": "Search by name",
+    "emptyPopular": "Popular in Lebanon",
     "chip": {
-      "waterNow": "Water now",
-      "today": "Today",
-      "inDays": "in {{count}}d"
+      "waterNow": "Water today",
+      "today": "Water today",
+      "inDays_one": "In {{count}} day",
+      "inDays_other": "In {{count}} days",
+      "allGood": "All good"
     }
   },
   "explore": {
     "title": "Explore",
     "hint": "Browse species and care guides",
     "searchPlaceholder": "Search species — basil, زيتون…",
-    "add": "+ Add"
+    "add": "+ Add",
+    "notInCatalog": "Not in your catalog yet",
+    "addingSpecies": "Adding…",
+    "moreResults": "More plants",
+    "suggestFailed": "Could not reach the plant database",
+    "adoptFailed": "Could not add that plant. Try again."
   },
   "community": {
     "title": "Community",
@@ -103,6 +124,7 @@
     "intervalLabel": "Watering interval",
     "intervalUnit_one": "day between waterings",
     "intervalUnit_other": "days between waterings",
+    "intervalHint": "Tap the number to change it",
     "confirmWaterTitle": "Watered it?",
     "confirmWaterBody_one": "This restarts the cycle — next watering in {{count}} day.",
     "confirmWaterBody_other": "This restarts the cycle — next watering in {{count}} days.",
@@ -152,7 +174,11 @@
     "failedTitle": "Something wilted",
     "failedBody": "We couldn't finish the check. Give it another try.",
     "retry": "Try again",
-    "devFixture": "DEV · {{name}}"
+    "devFixture": "DEV · {{name}}",
+    "checkedNow": "checked now",
+    "checked": "Checked",
+    "checkedLeaves": "Leaves, stem and soil look healthy",
+    "checkedNext": "Next check up in 2 weeks"
   },
   "post": {
     "title": "Post",
@@ -187,10 +213,22 @@
     "zoneTitle": "Where do you grow?",
     "zoneHint": "Flora tunes watering schedules to your climate zone.",
     "zones": {
-      "COASTAL": { "name": "Coastal", "hint": "Beirut, Tripoli, Saida — mild and humid" },
-      "MOUNTAIN": { "name": "Mountain", "hint": "Cool nights and snowy winters" },
-      "BEKAA": { "name": "Bekaa", "hint": "Dry summers, cold winters" },
-      "SOUTH": { "name": "South", "hint": "Warm and sunny most of the year" }
+      "COASTAL": {
+        "name": "Coastal",
+        "hint": "Beirut, Tripoli, Saida — mild and humid"
+      },
+      "MOUNTAIN": {
+        "name": "Mountain",
+        "hint": "Cool nights and snowy winters"
+      },
+      "BEKAA": {
+        "name": "Bekaa",
+        "hint": "Dry summers, cold winters"
+      },
+      "SOUTH": {
+        "name": "South",
+        "hint": "Warm and sunny most of the year"
+      }
     }
   }
 }

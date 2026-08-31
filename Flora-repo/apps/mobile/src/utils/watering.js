@@ -1,12 +1,15 @@
 const DAY_MS = 24 * 60 * 60 * 1000;
+/** Beyond this many days out a plant reads as "All good" rather than a countdown. */
+const ALL_GOOD_AFTER_DAYS = 7;
 
 /**
  * Watering chip status derived from a plant's nextDueAt.
  * Calendar-day comparison: due before today → overdue, same day → today.
- * A plant with no schedule yet (null) needs its first watering now.
+ * A plant with no schedule yet (null) needs its first watering now, and
+ * anything further out than a week reads as settled rather than a countdown.
  * @param {string|null} nextDueAt ISO timestamp or null
  * @param {number} [now] epoch ms, defaults to Date.now()
- * @returns {{ key: 'waterNow' } | { key: 'today' } | { key: 'inDays', days: number }}
+ * @returns {{ key: 'waterNow' } | { key: 'today' } | { key: 'inDays'|'allGood', days: number }}
  */
 export function waterStatus(nextDueAt, now = Date.now()) {
   if (!nextDueAt) return { key: 'waterNow' };
@@ -14,7 +17,8 @@ export function waterStatus(nextDueAt, now = Date.now()) {
   const dueStart = new Date(nextDueAt).setHours(0, 0, 0, 0);
   if (dueStart < todayStart) return { key: 'waterNow' };
   if (dueStart === todayStart) return { key: 'today' };
-  return { key: 'inDays', days: Math.round((dueStart - todayStart) / DAY_MS) };
+  const days = Math.round((dueStart - todayStart) / DAY_MS);
+  return { key: days > ALL_GOOD_AFTER_DAYS ? 'allGood' : 'inDays', days };
 }
 
 /**
@@ -73,21 +77,29 @@ export function dialFractionForDays(days) {
   return (clamped - MIN_INTERVAL_DAYS) / (MAX_INTERVAL_DAYS - MIN_INTERVAL_DAYS);
 }
 
+/** Arabic-Indic ٠-٩ and Persian ۰-۹, which an Arabic keyboard emits and parseInt cannot read. */
+const ARABIC_INDIC_DIGITS = /[٠-٩]/g;
+const PERSIAN_DIGITS = /[۰-۹]/g;
+
 /**
- * Map a touch on the dial back to a day count.
+ * Read a watering interval the user typed.
  *
- * Angle is measured clockwise from twelve o'clock, which is where the track
- * starts, so the maths matches what the user sees rather than SVG's default
- * three-o'clock origin.
+ * Returns null when there is no number in the text at all — an empty field, a
+ * half-deleted entry — so the caller can keep the interval it already had
+ * rather than writing a schedule of NaN days. A number outside the range
+ * clamps rather than failing: someone typing 90 means "as long as you allow",
+ * not "reject this".
  *
- * @param {number} dx horizontal distance from the dial centre
- * @param {number} dy vertical distance from the dial centre
- * @returns {number} a whole number of days within the allowed range
+ * @param {unknown} text
+ * @returns {number|null} a whole number of days within the allowed range, or null
  */
-export function daysForDialTouch(dx, dy) {
-  // atan2(dx, -dy) puts 0 at the top and grows clockwise.
-  const radians = Math.atan2(dx, -dy);
-  const fraction = (radians < 0 ? radians + 2 * Math.PI : radians) / (2 * Math.PI);
-  const span = MAX_INTERVAL_DAYS - MIN_INTERVAL_DAYS;
-  return Math.min(MAX_INTERVAL_DAYS, Math.max(MIN_INTERVAL_DAYS, Math.round(fraction * span) + MIN_INTERVAL_DAYS));
+export function parseIntervalDays(text) {
+  const digits = String(text ?? '')
+    .replace(ARABIC_INDIC_DIGITS, (digit) => String(digit.charCodeAt(0) - 0x0660))
+    .replace(PERSIAN_DIGITS, (digit) => String(digit.charCodeAt(0) - 0x06f0))
+    .replace(/\D/g, '');
+
+  if (!digits) return null;
+  const days = Number.parseInt(digits, 10);
+  return Math.min(MAX_INTERVAL_DAYS, Math.max(MIN_INTERVAL_DAYS, days));
 }

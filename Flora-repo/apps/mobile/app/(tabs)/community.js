@@ -64,8 +64,8 @@ export default function CommunityScreen() {
       <Button
         testID="feed-compose"
         label={t('community.compose')}
+        size="sm"
         onPress={() => router.push('/compose')}
-        style={styles.composeButton}
       />
     </View>
   );
@@ -119,9 +119,6 @@ const styles = StyleSheet.create({
   title: {
     color: colors.ink,
     fontSize: typeScale.display,
-  },
-  composeButton: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+    letterSpacing: -0.5,
   },
 });

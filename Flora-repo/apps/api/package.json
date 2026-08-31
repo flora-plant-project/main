@@ -13,6 +13,7 @@
     "start": "node src/server.js",
     "test": "vitest run",
     "smoke:bedrock": "node --env-file-if-exists=../../.env scripts/bedrock-smoke.js",
+    "smoke:gemini": "node --env-file-if-exists=../../.env scripts/gemini-smoke.js",
     "db:generate": "prisma generate",
     "db:migrate": "dotenv -e ../../.env -- prisma migrate dev",
     "db:deploy": "dotenv -e ../../.env -- prisma migrate deploy",

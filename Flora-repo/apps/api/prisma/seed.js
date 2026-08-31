@@ -66,6 +66,7 @@ async function main() {
       commonNames: species.commonNames,
       care: species.care,
       zoneMultipliers: species.zoneMultipliers,
+      source: species.source,
     })),
   });
 
